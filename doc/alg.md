@@ -18,6 +18,7 @@ Następne 3 są zawsze takie same przy tworzeniu nowych plików. Różnią się 
 ### bajty 5-8
 
 np. (hex)
+
 `01 00 00 00`, lub
 
 `05 00 00 00`, lub
@@ -33,9 +34,14 @@ Prawdopodobnie maksymalna ilość bloczków to 255 (bo `ff`).
 Każdy bloczek zajmuje 288 bajtów
 (18 * 2 * 8)
 
-- 1-24 -
-- 25-280 - zawartość bloczka
-- 281-288 - łączenia bloczka
+- 1-4 - pozycja x (---)
+- 5-8 - pozycja y (---)
+- 9-12 -
+- 13-16 -
+- 17-20 -
+- 21-276 - zawartość bloczka
+- 277-284 - łączenia bloczka
+- 285-288 - koniec bloczka
 
 ### zawartość bloczka
 
@@ -59,10 +65,10 @@ Pozostałe bajty to zera.
 
 Te bity kończą każdy bloczek.
 
-## Koniec pliku
-
-### ostatnie 4 bajty
+### koniec bloczka
 
 `01 00 00 00`
 
-Wszystkie pliki .alg kończą się jak wyżej.
+Te 4 bajty kończą każdy bloczek
+
+Zmiana `0x01` na inną liczbę nie ma wpływu na działanie programu i wyświetlanie bloczka.
