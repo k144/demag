@@ -35,17 +35,50 @@ Każdy bloczek zajmuje 288 bajtów
 (18 * 2 * 8)
 
 - 1-4 - pozycja x (---)
-- 5-8 - pozycja y (---)
-- 9-12 -
-- 13-16 -
-- 17-20 -
-- 21-276 - zawartość bloczka
+- 5-8 - pozycja y (|||)
+- 9-12 - szerokość? (same zera bezpieczne)
+- 13-16 - wysokość? (same zera bezpieczne)
+- 17-20 - typ bloczka
+- 21-276 - treść bloczka
 - 277-284 - łączenia bloczka
 - 285-288 - koniec bloczka
 
-### zawartość bloczka
+### pozycja
 
-Część odpowiedzialna za zawartość bloczka ma rozmiar 256 bajtów.
+Pozycja jest zapisywana w pierwszych 8 bajtach, po 4 na każdy wymiar.
+
+### 9-12
+
+Zapisuje jakąś liczbę. Nie wiadomo do czego. Można to bezpiecznie wyzerować, ale program po zapisaniu pliku nadpisuje to wartościami takimi jakie były wcześniej.
+
+Prawdopodobnie szerokość.
+
+### 13-16
+
+Jak wyżej, tylko zwykle jest to `2d 00 00 00`
+
+`0x2d` to `-` w ASCII, liczba 18 w dziesiętnym.
+
+Prawdopodobnie wysokość.
+
+### typ bloczka
+
+Typ bloczka zapisany jest w 8 bitach poprzedających treść bloczka.
+- 1 - start
+- 2 - koniec
+- 3 - przetwarzanie danych
+- 4 - warunkowy
+- 5 - sumacyjny
+- 6 - wejścia/wyjścia
+- 7 - komentarz
+
+Wszystkie wyższe wartości dają bloczek wyglądający jak ten od przetwarzania danych, ale dziwnie rozciągnięty i zmieniający rozmiar.
+
+0 nie daje nic.
+
+### treść bloczka
+
+Część odpowiedzialna za treść bloczka ma rozmiar 256 bajtów.
 
 Jeśli jest cokolwiek, zaczyna się od bajta oznaczającego ilość znaków, zaczynając od 0 jeśli wliczamy ten bajt, lub od 1 jeśli liczymy od następnego znaku.
 
