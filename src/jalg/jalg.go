@@ -35,4 +35,17 @@ func main() {
 		fmt.Println("========")
 	}
 	fmt.Printf("%x\n", fBegging)
+
+	bTypeMap := map[string]uint32{
+		"start":   1,
+		"stop":    2,
+		"data":    3,
+		"if":      4,
+		"sum":     5,
+		"io":      6,
+		"comment": 7,
+	}
+
+	fmt.Printf("%x\n", bTypeMap["data"])
+
 }
