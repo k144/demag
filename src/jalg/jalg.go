@@ -20,9 +20,10 @@ type Block struct {
 
 var Blocks *[]Block
 var filename string = "./test.json"
+var buf []byte
+var fBegging = []byte{0x3e, 0x67, 0x01, 0x0a}
 
 func main() {
-
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Printf("File error %v\n", err)
@@ -33,5 +34,5 @@ func main() {
 		fmt.Println(b)
 		fmt.Println("========")
 	}
-
+	fmt.Printf("%x\n", fBegging)
 }
