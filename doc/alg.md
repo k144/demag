@@ -25,9 +25,7 @@ np. (hex)
 
 `0b 00 00 00` itd
 
-Pierwszy bajt oznacza ilość bloczków. 3 kolejne to zera.
-
-Prawdopodobnie maksymalna ilość bloczków to 255 (bo `ff`).
+Ilość bloczków liczona od 1.
 
 ## Bloczki
 
@@ -43,17 +41,17 @@ Każdy bloczek zajmuje 288 bajtów
 - 277-284 - łączenia bloczka
 - 285-288 - koniec bloczka
 
-### Pozycja
+### Pozycja bloczka
 
 Pozycja bloczka jest zapisywana w pierwszych 8 bajtach, po 4 na każdy wymiar.
 
-### 9-12
+### Bajty 9-12 (szerokość?)
 
 Zapisuje jakąś liczbę. Nie wiadomo do czego. Można to bezpiecznie wyzerować, ale program po zapisaniu pliku nadpisuje to wartościami takimi jakie były wcześniej.
 
 Prawdopodobnie szerokość.
 
-### 13-16
+### Bajty 13-16 (wysokość?)
 
 Jak wyżej, tylko zwykle jest to `2d 00 00 00`
 
