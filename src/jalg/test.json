@@ -1,0 +1,32 @@
+[
+	{
+		"x": 10,
+		"y": 10,
+		"width": 0,
+		"height": 0,
+		"type": "start",
+		"content": " ",
+		"outA": 1,
+		"outB": null
+	},
+	{
+		"x": 10,
+		"y": 20,
+		"width": 0,
+		"height": 0,
+		"type": "io",
+		"content": "read test",
+		"outA": 2,
+		"outB": null
+	},
+	{
+		"x": 10,
+		"y": 30,
+		"width": 0,
+		"height": 0,
+		"type": "stop",
+		"content": " ",
+		"outA": null,
+		"outB": null
+	}
+]
