@@ -21,7 +21,7 @@ type Block struct {
 var Blocks *[]Block
 var filename string = "./test.json"
 var buf []byte
-var fBeginnig = []byte{0x3e, 0x67, 0x01, 0x0a}
+var fBeginning = []byte{0x3e, 0x67, 0x01, 0x0a}
 
 func main() {
 	file, err := ioutil.ReadFile(filename)
@@ -34,7 +34,7 @@ func main() {
 		fmt.Println(b)
 		fmt.Println("========")
 	}
-	fmt.Printf("%x\n", fBeginnig)
+	fmt.Printf("%x\n", fBeginning)
 
 	bTypeMap := map[string]uint32{
 		"start":   1,
