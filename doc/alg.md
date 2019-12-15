@@ -2,7 +2,7 @@
 
 ## Początek pliku
 
-### bajty 1-4
+### Bajty 1-4
 
 `3e 67 01 0a`
 
@@ -15,7 +15,7 @@ Pierwszy bajt to zawsze `0x3e`.
 Następne 3 są zawsze takie same przy tworzeniu nowych plików. Różnią się one od tych w domyślnych przykładach, które zaś również są sobie równe.
 
 
-### bajty 5-8
+### Bajty 5-8
 
 np. (hex)
 
@@ -43,9 +43,9 @@ Każdy bloczek zajmuje 288 bajtów
 - 277-284 - łączenia bloczka
 - 285-288 - koniec bloczka
 
-### pozycja
+### Pozycja
 
-Pozycja jest zapisywana w pierwszych 8 bajtach, po 4 na każdy wymiar.
+Pozycja bloczka jest zapisywana w pierwszych 8 bajtach, po 4 na każdy wymiar.
 
 ### 9-12
 
@@ -61,9 +61,9 @@ Jak wyżej, tylko zwykle jest to `2d 00 00 00`
 
 Prawdopodobnie wysokość.
 
-### typ bloczka
+### Typ bloczka
 
-Typ bloczka zapisany jest w 8 bitach poprzedających treść bloczka.
+Typ bloczka zapisany jest w 4 bajtach poprzedających treść bloczka.
 - 1 - start
 - 2 - koniec
 - 3 - przetwarzanie danych
@@ -76,7 +76,7 @@ Wszystkie wyższe wartości dają bloczek wyglądający jak ten od przetwarzania
 
 0 nie daje nic.
 
-### treść bloczka
+### Treść bloczka
 
 Część odpowiedzialna za treść bloczka ma rozmiar 256 bajtów.
 
@@ -90,15 +90,14 @@ Jeśli nie ma nic, to pierwsze dwa bajty to `0x01 0x20`. Drugi bajt to spacja w 
 Pozostałe bajty to zera.
 
 
-### połączenia bloczka
+### Połączenia bloczka
 
 `03 00 00 00 ff ff ff ff` - b. łączy się z b. nr 03 (4)
 
 `02 00 00 00 03 00 00 00` - b. łączy się z b. nr 02 jeśli tak, a z b. nr 03 jeśli nie
 
-Te bity kończą każdy bloczek.
 
-### koniec bloczka
+### Koniec bloczka
 
 `01 00 00 00`
 
