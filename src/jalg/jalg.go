@@ -30,11 +30,6 @@ func main() {
 		os.Exit(1)
 	}
 	json.Unmarshal(file, &Blocks)
-	for _, b := range *Blocks {
-		fmt.Println(b)
-		fmt.Println("========")
-	}
-	fmt.Printf("%x\n", fBeginning)
 
 	bTypeMap := map[string]uint32{
 		"start":   1,
@@ -46,6 +41,20 @@ func main() {
 		"comment": 7,
 	}
 
+	i := 0
+	for _, b := range *Blocks {
+		fmt.Println(i, "bloczek jest typu", b.Type)
+		if b.Type == "io" {
+			fmt.Printf("Bloczek ten umożliwia wprowadzanie i odczytywanie zmiennych. W pliku .alg typ ten jest zapisywany jako %b\n", bTypeMap["io"])
+		}
+		fmt.Println("========")
+		i++
+	}
+	fmt.Printf("%x\n", fBeginning)
+
 	fmt.Printf("%x\n", bTypeMap["data"])
 
 }
+
+//TODO: funkcja dodająca padding do bajtów
+//TODO: zapisywanie do pliku
