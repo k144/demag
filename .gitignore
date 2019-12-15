@@ -1,0 +1,7 @@
+bin/
+*magj
+*jalg
+*demag
+*.json
+*.alg
+*.mag
