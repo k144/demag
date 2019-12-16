@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 )
 
 type Block struct {
@@ -26,8 +25,8 @@ var fBeginning = []byte{0x3e, 0x67, 0x01, 0x0a}
 func main() {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("File error %v\n", err)
-		os.Exit(1)
+		fmt.Printf("Błąd pliku %v\n", err)
+		panic(err)
 	}
 	json.Unmarshal(file, &Blocks)
 
@@ -41,20 +40,17 @@ func main() {
 		"comment": 7,
 	}
 
-	i := 0
 	for _, b := range *Blocks {
-		fmt.Println(i, "bloczek jest typu", b.Type)
-		if b.Type == "io" {
-			fmt.Printf("Bloczek ten umożliwia wprowadzanie i odczytywanie zmiennych. W pliku .alg typ ten jest zapisywany jako %b\n", bTypeMap["io"])
-		}
-		fmt.Println("========")
-		i++
+		fmt.Println(bTypeMap[b.Type])
 	}
-	fmt.Printf("%x\n", fBeginning)
 
 	fmt.Printf("%x\n", bTypeMap["data"])
+
+	buf = append(fBeginning)
+	outf := "wynik.alg"
+
+	ioutil.WriteFile(outf, buf, 0644)
 
 }
 
 //TODO: funkcja dodająca padding do bajtów
-//TODO: zapisywanie do pliku
