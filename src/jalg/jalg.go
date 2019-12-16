@@ -7,14 +7,14 @@ import (
 )
 
 type Block struct {
-	X       uint32 `json: x`
-	Y       uint32 `json: y`
-	Width   uint32 `json: width`
-	Height  uint32 `json: height`
-	Type    string `json: type`
-	Content string `json: content`
-	OutA    uint32 `json: outA`
-	OutB    uint32 `json: outB`
+	X       uint32 `json:"x"`
+	Y       uint32 `json:"y"`
+	Width   uint32 `json:"width"`
+	Height  uint32 `json:"height"`
+	Type    string `json:"type"`
+	Content string `json:"content"`
+	OutA    uint32 `json:"outA"`
+	OutB    uint32 `json:"outB"`
 }
 
 var Blocks *[]Block
