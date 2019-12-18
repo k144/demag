@@ -5,28 +5,59 @@
 		"width": 0,
 		"height": 0,
 		"type": "start",
-		"content": " ",
+		"content": "",
 		"outA": 1,
-		"outB": null
+		"outB": 4294967295
 	},
 	{
 		"x": 10,
-		"y": 20,
+		"y": 100,
 		"width": 0,
 		"height": 0,
 		"type": "io",
 		"content": "read test",
 		"outA": 2,
-		"outB": null
+		"outB": 4294967295
 	},
 	{
 		"x": 10,
-		"y": 30,
+		"y": 200,
+		"width": 0,
+		"height": 0,
+		"type": "if",
+		"content": "test == \"dupa\" ",
+		"outA": 3,
+		"outB": 4
+	},
+	{
+		"x": 10,
+		"y": 300,
+		"width": 0,
+		"height": 0,
+		"type": "io",
+		"content": "write \"dupa123\"",
+		"outA": 5,
+		"outB": 4294967295
+	},
+	{
+		"x": 100,
+		"y": 300,
+		"width": 0,
+		"height": 0,
+		"type": "io",
+		"content": "write \"1212esadfsdfasdscxzcsadasd\"",
+		"outA": 5,
+		"outB": 4294967295
+	},
+
+	{
+		"x": 50,
+		"y": 400,
 		"width": 0,
 		"height": 0,
 		"type": "stop",
-		"content": " ",
-		"outA": null,
-		"outB": null
+		"content": "",
+		"outA": 4294967295,
+		"outB": 4294967295
 	}
 ]

@@ -23,22 +23,12 @@ type Block struct {
 
 var Blocks *[]Block
 
-var filename string = "./test.json"
-var buf []byte
-var fBeginning = []byte{0x3e, 0x67, 0x01, 0x0a}
-
-// Ta funkcja będzie prawdopodobnie do usunięcia (bo LittleEndian),
-// ale zostawię, aż dojdę do treści bloczka, bo może się przydać
-func pad(b []byte, l int) ([]byte, error) {
-	if l < len(b) {
-		return b, fmt.Errorf("pad: Podana długość %d jest mniejsza niż długość wycinka %d.", l, len(b))
-	}
-	padding := make([]byte, l-len(b))
-	result := append(b, padding...)
-	return result, nil
-}
-
+// TODO: CLI
 func main() {
+	var buf []byte
+	filename := "./test.json"
+	outf := "wynik.alg"
+
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
 		fmt.Printf("Błąd pliku %v\n", err)
@@ -46,8 +36,14 @@ func main() {
 	}
 	json.Unmarshal(file, &Blocks)
 
-	// TODO: Zmienić z powrotem na uint32
-	bTypeMap := map[string]byte{
+	var fBeginning = [4]byte{0x3e, 0x67, 0x01, 0x0a}
+	buf = append(buf, fBeginning[0:]...)
+
+	var nBlocks [4]byte
+	binary.LittleEndian.PutUint32(nBlocks[0:], uint32(len(*Blocks)))
+	buf = append(buf, nBlocks[0:]...)
+
+	bTypeMap := map[string]uint32{
 		"start":   1,
 		"stop":    2,
 		"data":    3,
@@ -57,29 +53,38 @@ func main() {
 		"comment": 7,
 	}
 
-	fBeginning, err := pad(fBeginning, 2)
-	if err != nil {
-		fmt.Println(err)
-	}
+	const blockSize int = 288 // liczba bajtów w bloczku
 
 	for _, b := range *Blocks {
+		bBuf := make([]byte, blockSize)
+		bEnd := []byte{0x01, 0x00, 0x00, 0x00}
 
-		sType, err := pad([]byte{bTypeMap[b.Type]}, 4)
-		if err != nil {
-			fmt.Println(err)
+		bBegMap := map[uint32]int{
+			b.X:              0,
+			b.Y:              4,
+			b.Width:          8,
+			b.Height:         12,
+			bTypeMap[b.Type]: 16,
+		}
+		for data, pos := range bBegMap {
+			binary.LittleEndian.PutUint32(bBuf[pos:], data)
 		}
 
-		fmt.Println(sType)
-		bBuf := make([]byte, 16)
-		binary.LittleEndian.PutUint32(bBuf[0:], 0x01ef)
-		fmt.Println(bBuf)
+		if b.Content == "" {
+			b.Content = " "
+		}
+		bBuf[20] = byte(len(b.Content))
+		copy(bBuf[21:], b.Content)
+
+		binary.LittleEndian.PutUint32(bBuf[276:], b.OutA)
+		binary.LittleEndian.PutUint32(bBuf[280:], b.OutB)
+
+		copy(bBuf[284:], bEnd)
+
+		buf = append(buf, bBuf...)
 
 	}
 
-	fmt.Printf("%x\n", bTypeMap["data"])
-
-	buf = append(fBeginning)
-	outf := "wynik.alg"
 	ioutil.WriteFile(outf, buf, 0644)
 
 }
