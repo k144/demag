@@ -1,5 +1,5 @@
-// jalg - kompilator plików JSON do formatu .alg wspieranego przez
-// Magiczne Bloczki®
+// jalg - kompilator plików JSON do formatu .alg
+// wspieranego przez Magiczne Bloczki®
 
 package main
 
@@ -8,6 +8,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
+
+	"launchpad.net/gnuflag"
 )
 
 type Block struct {
@@ -23,18 +26,35 @@ type Block struct {
 
 var Blocks *[]Block
 
-// TODO: CLI
+// TODO: --help
 func main() {
-	var buf []byte
-	filename := "./test.json"
-	outf := "wynik.alg"
 
-	file, err := ioutil.ReadFile(filename)
+	destP := gnuflag.String("o", "o.alg", "plik wyjściowy ([o]utput)")
+	gnuflag.Parse(true)
+
+	destF := *destP
+	sourceF := gnuflag.Arg(0)
+	if destF == "o.alg" {
+		fmt.Println("zmiana")
+
+		destF = strings.TrimSuffix(sourceF, ".json") + ".alg"
+	} else {
+		fmt.Println("nie działa?")
+		fmt.Println(sourceF)
+
+	}
+
+	fmt.Println("source: ", sourceF)
+	fmt.Println("dest: ", destF)
+
+	file, err := ioutil.ReadFile(sourceF)
 	if err != nil {
 		fmt.Printf("Błąd pliku %v\n", err)
 		panic(err)
 	}
 	json.Unmarshal(file, &Blocks)
+
+	var buf []byte
 
 	var fBeginning = [4]byte{0x3e, 0x67, 0x01, 0x0a}
 	buf = append(buf, fBeginning[0:]...)
@@ -45,7 +65,7 @@ func main() {
 
 	bTypeMap := map[string]uint32{
 		"start":   1,
-		"stop":    2,
+		"end":     2,
 		"data":    3,
 		"if":      4,
 		"sum":     5,
@@ -85,6 +105,5 @@ func main() {
 
 	}
 
-	ioutil.WriteFile(outf, buf, 0644)
-
+	ioutil.WriteFile(destF, buf, 0644)
 }

@@ -55,7 +55,7 @@
 		"y": 400,
 		"width": 0,
 		"height": 0,
-		"type": "stop",
+		"type": "end",
 		"content": "",
 		"outA": 4294967295,
 		"outB": 4294967295

@@ -1,3 +1,4 @@
+[
 {
 	"x": 10,
 	"y": 10,
@@ -5,6 +6,7 @@
 	"height": 0,
 	"type": "start",
 	"content": "treść",
-	"outA": 1,
-	"outB": null
+	"outA": 4294967295,
+	"outB": 4294967295
 }
+]
