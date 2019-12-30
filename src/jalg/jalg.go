@@ -35,17 +35,8 @@ func main() {
 	destF := *destP
 	sourceF := gnuflag.Arg(0)
 	if destF == "o.alg" {
-		fmt.Println("zmiana")
-
 		destF = strings.TrimSuffix(sourceF, ".json") + ".alg"
-	} else {
-		fmt.Println("nie działa?")
-		fmt.Println(sourceF)
-
 	}
-
-	fmt.Println("source: ", sourceF)
-	fmt.Println("dest: ", destF)
 
 	file, err := ioutil.ReadFile(sourceF)
 	if err != nil {
