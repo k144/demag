@@ -9,7 +9,7 @@
     <script src="codemirror/lib/codemirror.js"></script>
     <link rel="stylesheet" href="codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="codemirror/theme/base16-light.css">
-    <script src="codemirror/mode/go/go.js"></script>
+    <script src="codemirror/mode/mag/mag.js"></script>
     <script src="jquery.js"></script>
     <link rel="stylesheet" href="css/style.css">
 
@@ -22,17 +22,15 @@
     <textarea id="codeBox" cols="30" rows="10"></textarea>
     <script>
         var codeBox = CodeMirror.fromTextArea(document.getElementById("codeBox"), {
-            mode:  "go",
+            mode:  "mag",
             theme: "base16-light",
             indentUnit: 4,
             lineNumbers: true,
             indentWithTabs: true,
         }).on("change", codeBox => parse(codeBox));
     </script>
-    <button type="button" onclick="parse(codeBox)">parsuj</button>
+    <button type="button" onclick="console.log(window.codeBox)">parsuj</button>
     <p id="out"></p>
-
     <script src="parser.js"></script>
 </body>
-
 </html>

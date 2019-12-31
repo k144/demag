@@ -11,27 +11,16 @@
 })(function(CodeMirror) {
 "use strict";
 
-CodeMirror.defineMode("go", function(config) {
+CodeMirror.defineMode("mag", function(config) {
   var indentUnit = config.indentUnit;
 
   var keywords = {
-    "break":true, "case":true, "chan":true, "const":true, "continue":true,
-    "default":true, "defer":true, "else":true, "fallthrough":true, "for":true,
-    "func":true, "go":true, "goto":true, "if":true, "import":true,
-    "interface":true, "map":true, "package":true, "range":true, "return":true,
-    "select":true, "struct":true, "switch":true, "type":true, "var":true,
-    "bool":true, "byte":true, "complex64":true, "complex128":true,
-    "float32":true, "float64":true, "int8":true, "int16":true, "int32":true,
-    "int64":true, "string":true, "uint8":true, "uint16":true, "uint32":true,
-    "uint64":true, "int":true, "uint":true, "uintptr":true, "error": true,
-    "rune":true
+    "break":true, "case":true, "else":true, "for":true, "foreach":true,
+    "in":true, "goto":true, "if":true, "switch":true, "dim":true, "set":true
   };
 
   var atoms = {
-    "true":true, "false":true, "iota":true, "nil":true, "append":true,
-    "cap":true, "close":true, "complex":true, "copy":true, "delete":true, "imag":true,
-    "len":true, "make":true, "new":true, "panic":true, "print":true,
-    "println":true, "real":true, "recover":true
+    "read":true, "write":true
   };
 
   var isOperatorChar = /[+\-*&^%:=<>!|\/]/;
@@ -182,6 +171,6 @@ CodeMirror.defineMode("go", function(config) {
   };
 });
 
-CodeMirror.defineMIME("text/x-go", "go");
+CodeMirror.defineMIME("text/x-mag", "mag");
 
 });
