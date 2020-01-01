@@ -1,0 +1,14 @@
+body {
+  font-size: 15px;
+}
+
+textarea {
+  color: black;
+  font-size: 2rem;
+  font-family: mono;
+  width: 50%;
+  margin: 0;
+  padding: 0;
+  resize: none;
+}
+/*# sourceMappingURL=style.css.map */
