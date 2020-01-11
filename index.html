@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="parser.js"></script>
     <title>Demag</title>
+
     <script src="codemirror/lib/codemirror.js"></script>
     <link rel="stylesheet" href="codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="codemirror/theme/base16-light.css">
     <script src="codemirror/mode/mag/mag.js"></script>
+
     <script src="script/jquery.js"></script>
+    <script src="script/wasm_exec.js"></script>
+
+
     <link rel="stylesheet" href="css/style.css">
 
 <body>
@@ -27,11 +31,12 @@
             indentUnit: 4,
             lineNumbers: true,
             indentWithTabs: true,
-        }).on("change", codeBox => parse(codeBox));
-        console.log(codeBox)
+        }).on("change", codeBox => editorHandler(codeBox));
     </script>
-    <button type="button" onclick="console.log(window.codeBox)">parsuj</button>
+    <button type="button" id="dl-button">pobierz</button>
     <p id="out"></p>
     <script src="script/parser.js"></script>
+    <script src="script/FileSaver.min.js"></script>
+    <script src="script/jalg.js"></script>
 </body>
 </html>
