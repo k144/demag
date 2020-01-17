@@ -34,6 +34,8 @@ func parse(input []byte) []byte {
 
 	var Blocks []Block
 	err := json.Unmarshal(input, &Blocks)
+	fmt.Println(Blocks)
+
 	if err != nil {
 		fmt.Println("error:", err)
 	}
@@ -63,6 +65,8 @@ func parse(input []byte) []byte {
 	const blockSize int = 288 // liczba bajtów w bloczku
 
 	for _, b := range Blocks {
+		fmt.Println(b)
+
 		bBuf := make([]byte, blockSize)
 		bEnd := []byte{0x01, 0x00, 0x00, 0x00}
 
@@ -91,6 +95,8 @@ func parse(input []byte) []byte {
 		buf = append(buf, bBuf...)
 
 	}
+	fmt.Println(buf, len(buf))
+
 	return buf
 }
 
@@ -106,9 +112,10 @@ func main() {
 		var JSONdata []byte
 		JSONdata = buf[:bufLen]
 		parsed := parse(JSONdata)
-		// ↓↓↓ trochę brudne zagranie, ale działa
-		js.CopyBytesToJS(args[0], parsed)
-		return args[0]
+		fmt.Println("ppp ", parsed)
+		bytesCopied := js.CopyBytesToJS(args[1], parsed)
+		return bytesCopied
+
 	})
 	js.Global().Set("jalg", handleJSON)
 	<-c
