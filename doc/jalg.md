@@ -8,7 +8,7 @@
 
 Dane wejściowe powinny być w formie tablicy obiektów. Każdy obiekt reprezentuje 1 bloczek.
 
-`
+```javascript
 [
 	{
 		"x": (pozycja x, liczba),
@@ -28,7 +28,7 @@ Dane wejściowe powinny być w formie tablicy obiektów. Każdy obiekt reprezent
 		...
 	}
 ]
-`
+```
 
 *\*szerokość i wysokość* 
 
