@@ -30,6 +30,6 @@ Dane wejściowe powinny być w formie tablicy obiektów. Każdy obiekt reprezent
 ]
 ```
 
-*\*szerokość i wysokość* 
+*\*jeśli szerokość lub/i wysokość będą zerowe, wtedy Magiczne Bloczki® same obliczą sobie te wartości.* 
 
 Dane wejściowe mogą być zminifikowane.
