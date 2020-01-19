@@ -16,6 +16,7 @@
 
 
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/blocks.css">
 
 <body>
 
@@ -23,18 +24,55 @@
     <textarea id="mag" name="codeBox" cols="30" rows="10" oninput="parse()" onkeydown="tabhandler()"></textarea>
     -->
     
-    <textarea id="codeBox" cols="30" rows="10"></textarea>
-    <script>
-        var codeBox = CodeMirror.fromTextArea(document.getElementById("codeBox"), {
-            mode:  "mag",
-            theme: "base16-light",
-            indentUnit: 4,
-            lineNumbers: true,
-            indentWithTabs: true,
-        }).on("change", codeBox => editorHandler(codeBox));
-    </script>
-    <button type="button" id="dl-button">pobierz</button>
-    <p id="out"></p>
+    <div id="main-wrapper">
+        <section id="codeBox-wrapper">
+
+
+
+            <textarea id="codeBox" cols="30" rows="10">read x</textarea>
+            <script>
+                var codeBox = CodeMirror.fromTextArea(document.getElementById("codeBox"), {
+                    value: "x := 3",
+                    mode:  "mag",
+                    theme: "base16-light",
+                    indentUnit: 4,
+                    indentWithTabs: true,
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    viewportMargin: Infinity
+                })
+                .on("change", codeBox =>
+                    editorHandler(codeBox));
+            </script>
+        </section>
+            <nav>
+
+                <input type="radio" name="output" id="blocks-tab" class="tab" checked>
+                <label for="blocks-tab">bloczki</label>
+
+                <input type="radio" name="output" id="json-tab" class="tab">
+                <label for="json-tab">JSON</label>
+
+            </nav>
+
+        <section id="output-wrapper">
+
+            <output id="blocks">
+                bloczek
+            </output>
+            <output id="json" style="display:none;"></output>
+
+        </section>
+
+        <section id="dl-wrapper">
+            <button type="button" id="dl-button">
+                pobierz
+            </button>
+        </section>
+
+    </div> 
+    <script src="script/ui.js"></script>
+    <script src="script/draw.js"></script>
     <script src="script/parser.js"></script>
     <script src="script/FileSaver.min.js"></script>
     <script src="script/jalg.js"></script>

@@ -1,0 +1,72 @@
+.block {
+  display: block;
+  position: relative;
+  padding: 10px;
+  width: 200px;
+  background: #fdebba;
+  margin: 20px auto;
+  position: relative;
+  -webkit-filter: drop-shadow(0px 0px 1px #000) drop-shadow(0px 0px 1px #000);
+          filter: drop-shadow(0px 0px 1px #000) drop-shadow(0px 0px 1px #000);
+}
+
+.block-start,
+.block-end {
+  text-align: center;
+  border-radius: 20px;
+}
+
+.block-io {
+  min-height: 40px;
+  line-height: 40px;
+  padding: 0;
+  margin: 20px auto;
+}
+
+.block-io:before {
+  content: "";
+  border-style: solid;
+  border-width: 20px 15px 20px 15px;
+  border-color: transparent #fdebba #fdebba transparent;
+  position: absolute;
+  left: -30px;
+}
+
+.block-io:after {
+  content: "";
+  border-style: solid;
+  border-width: 20px 15px 20px 15px;
+  border-color: #fdebba transparent transparent #fdebba;
+  position: absolute;
+  right: -30px;
+}
+
+.block-if-oneline,
+.block-if-multiline {
+  height: 40px;
+  padding: 0;
+  line-height: 40px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.block-if-oneline:before,
+.block-if-multiline:before {
+  content: "";
+  border-style: solid;
+  border-width: 20px 30px 20px 0;
+  border-color: transparent #fdebba transparent transparent;
+  position: absolute;
+  left: -30px;
+}
+
+.block-if-oneline:after,
+.block-if-multiline:after {
+  content: "";
+  border-style: solid;
+  border-width: 20px 0px 20px 30px;
+  border-color: transparent transparent transparent #fdebba;
+  position: absolute;
+  right: -30px;
+}
+/*# sourceMappingURL=blocks.css.map */

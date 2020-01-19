@@ -1,0 +1,61 @@
+$block-background: #fdebba
+
+.block
+    display: block
+    position: relative
+    padding: 10px
+    width: 200px
+    background: $block-background
+    margin: 20px auto
+    position: relative
+    filter: drop-shadow(0px 0px 1px #000) drop-shadow(0px 0px 1px #000)
+
+.block-start,
+.block-end
+    text-align: center
+    border-radius: 20px
+
+.block-io
+    min-height: 40px
+    line-height: 40px
+    padding: 0
+    margin: 20px auto
+    &:before
+        content: ""
+        border-style: solid
+        border-width: 20px 15px 20px 15px
+        border-color: transparent $block-background $block-background transparent
+        position: absolute
+        left: -30px
+    &:after
+        content: ""
+        border-style: solid
+        border-width: 20px 15px 20px 15px
+        border-color: $block-background transparent transparent $block-background
+        position: absolute
+        right: -30px
+
+.block-if-oneline,
+.block-if-multiline
+    height: 40px
+    padding: 0
+    line-height: 40px
+    margin: 20px auto
+    text-align: center
+    //box-sizing: border-box
+    &:before
+        content: ""
+        border-style: solid
+        border-width: 20px 30px 20px 0
+        border-color: transparent $block-background transparent transparent
+        position: absolute
+        left: -30px
+
+    &:after
+        content: ""
+        border-style: solid
+        border-width: 20px 0px 20px 30px
+        border-color: transparent transparent transparent $block-background
+        position: absolute
+        right: -30px
+
