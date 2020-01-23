@@ -12,8 +12,8 @@ function getLineType(line) {
         [/\}/,                     "close-bracket"],
         [/^[a-zA-Z]+\w*\s*(=|:=)/, "data"],
         [/^(read|write)\s+/,       "io"],
-        [/^(if)\s+\S+\s*$/,        "if-oneline"],
-        [/^(if)\s+\S+\s*\{\s*$/,   "if-multiline"]
+        [/^(if)[^{]*$/,        "if-oneline"],
+        [/^(if).*\{\s*$/,   "if-multiline"]
     ]);
     for (let entry of typeMap) {
         let regExp = entry[0];
@@ -25,13 +25,66 @@ function getLineType(line) {
     
 }
 
+const outNull = 4294967295; // tak oznaczone jest puste wyjście bloczka
+const blockOffset = 100;
+
+function parseLines(lines){
+    let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
+    lines.forEach((line, i)=>{
+
+        let lineType = getLineType(line)
+        let block = new Object()
+        switch(lineType) {
+        // bloczek danych
+        case "data":
+            block = {
+                type: lineType,
+                content: line,
+                outA: i + 2,
+                outB: outNull,
+            };
+            blocks.push(block);
+            break;
+
+        // bloczek wejścia wyjścia
+        case "io":
+            block = {
+                type: lineType,
+                content: line,
+                outA: i + 2,
+                outB: outNull,
+            }
+            blocks.push(block);
+            break;
+        
+        // bloczek warunkowy
+        // dokończyć
+        case "if-oneline":
+            blocks.push({
+                type: lineType,
+                // usuwa `if` i `{` oraz znaki białe wokół nich
+                content: line
+                    .replace(/(if)\s*/, "")
+                    .replace(/\s*$/, ""),
+                outA: i + 2,
+                outB: i + 3
+            });
+            lines.splice(i, 2);
+            break;
+        case "if-multiline":
+            blocks.push({
+                type: lineType
+            })
+            break;
+        }
+    })
+    return blocks
+}
+
 function parse(mag) {
     let lines = mag.split("\n");
     let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
-    const outNull = 4294967295; // tak oznaczone jest puste wyjście bloczka
     blocks.push({
-		"x": 100,
-		"y": 100,
 		"width": 0,
 		"height": 0,
 		"type": "start",
@@ -40,64 +93,9 @@ function parse(mag) {
 		"outB": outNull
 	})
 
-    const blockOffset = 100;
-    lines.forEach((line, i)=>{
-
-        let lineType = getLineType(line)
-        switch(lineType) {
-            // bloczek danych
-            case "data":
-                blocks.push({
-                    x: blocks[blocks.length - 1].x + blockOffset,
-                    y: blocks[blocks.length - 1].y + blockOffset,
-                    width: 0,
-                    height: 0,
-                    type: lineType,
-                    content: line,
-                    outA: i + 2,
-                    outB: outNull,
-                })
-                break;
-
-            // bloczek wejścia wyjścia
-            case "io":
-                blocks.push({
-                    x: blocks[blocks.length - 1].x + blockOffset,
-                    y: blocks[blocks.length - 1].y + blockOffset,
-                    width: 0,
-                    height: 0,
-                    type: lineType,
-                    content: line,
-                    outA: i + 2,
-                    outB: outNull,
-                });
-                break;
-            
-            // bloczek warunkowy
-            // dokończyć
-            case "if-oneline":
-                blocks.push({
-                    type: lineType,
-                    // usuwa `if` i `{` oraz znaki białe wokół nich
-                    content: line
-                        .replace(/(if)\s*/, "")
-                        .replace(/\s*[{]/, ""),
-                    outA: i + 2,
-                    outB: i + 3
-                });
-                lines.splice(i, 2);
-            case "if-multiline":
-                blocks.push({
-                    type: lineType
-                })
-
-                break;
-        }
-        
-    })
+    blocks.push.apply(blocks, parseLines(lines));
+    
     blocks.push({
-            "x": blocks[blocks.length - 1].x + blockOffset,
-            "y": blocks[blocks.length - 1].y + blockOffset,
             "width": 0,
             "height": 0,
             "type": "end",
@@ -105,6 +103,8 @@ function parse(mag) {
             "outA": outNull,
             "outB": outNull
         })
+    
+    console.log(blocks);
 
     Blocks = blocks; // "upublicznia" bloczki
     let output = new Array();
@@ -114,5 +114,5 @@ function parse(mag) {
     ));
     document.getElementById("json")
         .innerHTML = output.join("<br><br>");
-    draw();
+    put(draw(Blocks));
 }

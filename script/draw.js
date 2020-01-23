@@ -1,7 +1,12 @@
-function draw() {
+function put(content) {
     let board = $("#blocks");
     board.empty();
-    Blocks.forEach((block) => board.append(
+    board.append(content);
+}
+
+function draw(blocks) {
+    let buf = new Array()
+    blocks.forEach((block) => buf.push(
         '<div class="' +
         'block' + ' ' +
         'block-' + block.type +
@@ -9,4 +14,5 @@ function draw() {
         block.content +
         '</div>'
     ));
+    return buf
 }
