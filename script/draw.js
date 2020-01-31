@@ -5,14 +5,31 @@ function put(content) {
 }
 
 function draw(blocks) {
-    let buf = new Array()
-    blocks.forEach((block) => buf.push(
-        '<div class="' +
-        'block' + ' ' +
-        'block-' + block.type +
-        '">' +
-        block.content +
-        '</div>'
-    ));
-    return buf
+    let buf = ''
+    blocks.forEach((block) =>{
+        switch(block.type){
+        case "wrapper-open":
+            buf +=
+                '<div class="' +
+                'block-wrapper' + ' ' +
+                block.wrapperType + '-wrapper' +
+                '">'
+            break;
+        case "wrapper-close":
+            buf +=
+                '</div>'
+            break;
+        default:
+            buf +=
+                '<div class="' +
+                'block' + ' ' +
+                'block-' + block.type +
+                '" ' +
+                'id="' + block.ID + '">' +
+                block.content +
+                '</div>'
+            break;
+        }
+    });
+    return buf;
 }

@@ -1,10 +1,22 @@
 $block-background: #fdebba
 
+#blocks-output-wrapper
+    min-height: 100%
+    width: 100%
+    overflow: auto
+    box-sizing: border-box
+
+#blocks
+    display: flex
+    flex-direction: column
+    margin: 0 auto
+    width: max-content
+    padding: 40px
+
 .block
     display: block
     position: relative
     padding: 10px
-    width: 200px
     background: $block-background
     margin: 20px auto
     position: relative
@@ -14,12 +26,12 @@ $block-background: #fdebba
 .block-end
     text-align: center
     border-radius: 20px
+    width: 200px
 
 .block-io
     min-height: 40px
     line-height: 40px
     padding: 0
-    margin: 20px auto
     &:before
         content: ""
         border-style: solid
@@ -35,13 +47,13 @@ $block-background: #fdebba
         position: absolute
         right: -30px
 
-.block-if-oneline,
-.block-if-multiline
+.block-if
     height: 40px
     padding: 0
     line-height: 40px
-    margin: 20px auto
     text-align: center
+    margin: 20px auto
+    postition: relative
     //box-sizing: border-box
     &:before
         content: ""
@@ -59,3 +71,11 @@ $block-background: #fdebba
         position: absolute
         right: -30px
 
+.block-wrapper
+    background-color: #00000011
+    position: relative
+    display: flex
+    flex-direction: column
+
+.if-wrapper
+    padding: 10px 40px

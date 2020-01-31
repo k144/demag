@@ -1,19 +1,24 @@
-var editorContent = ""
-$(() => parse("")) // tworzy bloczki startu i końca po załadowniu strony
+/*--- ZMIENNE GLOBALNE ---*/
+var Blocks = new Array(); // bloczki dostępne publicznie
+var CurrentID = 0;
+
+// tworzy bloczki startu i końca po załadowniu strony
+$(() => parse("")) 
+
+var editorContent = "";
 
 function editorHandler(editor){
     editorContent = editor.getValue("\n");
     parse(editorContent);
 }
-var Blocks = new Array(); // bloczki dostępne publicznie
 
 function getLineType(line) {
     let typeMap = new Map([
-        [/\}/,                     "close-bracket"],
-        [/^[a-zA-Z]+\w*\s*(=|:=)/, "data"],
-        [/^(read|write)\s+/,       "io"],
-        [/^(if)[^{]*$/,        "if-oneline"],
-        [/^(if).*\{\s*$/,   "if-multiline"]
+        [/^\s*\}\s*$/,                "close-bracket"],
+        [/^\s*[a-zA-Z]+\w*\s*(=|:=)/, "data"],
+        [/^\s*(read|write)\s+/,       "io"],
+        [/^\s*(if)\s+.*\{\s*$/,       "if"],
+        [/^\s*\}\s*(else)\s*\{\s*$/,  "else"]
     ]);
     for (let entry of typeMap) {
         let regExp = entry[0];
@@ -30,51 +35,79 @@ const blockOffset = 100;
 
 function parseLines(lines){
     let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
+    let ifStack = new Array();
+
     lines.forEach((line, i)=>{
 
-        let lineType = getLineType(line)
-        let block = new Object()
+        let lineType = getLineType(line);
+        let block = new Object();
+
         switch(lineType) {
         // bloczek danych
         case "data":
+            CurrentID++;
             block = {
+                ID: CurrentID,
                 type: lineType,
                 content: line,
-                outA: i + 2,
+                outA: CurrentID + 1,
                 outB: outNull,
             };
             blocks.push(block);
             break;
 
+
         // bloczek wejścia wyjścia
         case "io":
+            CurrentID++;
             block = {
+                ID: CurrentID,
                 type: lineType,
                 content: line,
-                outA: i + 2,
+                outA: CurrentID + 1,
                 outB: outNull,
             }
             blocks.push(block);
             break;
-        
-        // bloczek warunkowy
-        // dokończyć
-        case "if-oneline":
-            blocks.push({
-                type: lineType,
-                // usuwa `if` i `{` oraz znaki białe wokół nich
-                content: line
-                    .replace(/(if)\s*/, "")
-                    .replace(/\s*$/, ""),
-                outA: i + 2,
-                outB: i + 3
-            });
-            lines.splice(i, 2);
+
+        case "if":
+            CurrentID++;
+            blocks.push(
+                {
+                    type: "wrapper-open",
+                    wrapperType: "if"
+                },
+                {
+                    ID: CurrentID,
+                    type: lineType,
+                    content: line
+                        // usuwa `if` i `{` oraz znaki białe wokół nich
+                        .replace(/(if)\s*/, "")
+                        .replace(/\s*\{\s*$/, ""),
+                    outB: CurrentID + 1
+                }
+            )
+            ifStack.push({head: blocks.length - 1}); // pozycja tego bloczka warunkowego w tablicy bloczków
             break;
-        case "if-multiline":
+        
+        case "else":
+            ifStack[ifStack.length - 1]
+                .lastTrue = CurrentID
+            break;
+    
+        case "close-bracket":
             blocks.push({
-                type: lineType
+                type: "wrapper-close"
             })
+
+            let thisIf = ifStack.pop();
+
+            blocks[thisIf.head]
+                .outA = thisIf.lastTrue + 1;
+
+            blocks[thisIf.lastTrue]
+                .outA = CurrentID + 1
+
             break;
         }
     })
@@ -84,7 +117,9 @@ function parseLines(lines){
 function parse(mag) {
     let lines = mag.split("\n");
     let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
+    CurrentID = 0;
     blocks.push({
+        "ID": CurrentID,
 		"width": 0,
 		"height": 0,
 		"type": "start",
@@ -95,14 +130,16 @@ function parse(mag) {
 
     blocks.push.apply(blocks, parseLines(lines));
     
+    CurrentID++;
     blocks.push({
-            "width": 0,
-            "height": 0,
-            "type": "end",
-            "content": "koniec",
-            "outA": outNull,
-            "outB": outNull
-        })
+        "ID": CurrentID,
+        "width": 0,
+        "height": 0,
+        "type": "end",
+        "content": "koniec",
+        "outA": outNull,
+        "outB": outNull
+    })
     
     console.log(blocks);
 

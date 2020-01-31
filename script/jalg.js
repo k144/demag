@@ -8,6 +8,12 @@ $("#dl-button").click(() => {
 })
 
 function download() {
+	Blocks.forEach((block, i) => {
+		if (block.type == "wrapper-open" || block.type == "wrapper-close"){
+			Blocks.splice(i, 1);
+		}
+	})
+
     let JSONdata = new Blob(
         [JSON.stringify(Blocks)],
         {type: "text/plain;charset=utf-8"}
