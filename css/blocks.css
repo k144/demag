@@ -7,6 +7,7 @@
 }
 
 #blocks {
+  position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -22,12 +23,12 @@
 }
 
 .block {
+  font-size: 10px;
   display: block;
-  position: relative;
-  padding: 10px;
+  padding: 18px;
   background: #fdebba;
-  margin: 20px auto;
-  position: relative;
+  margin: 10px auto;
+  width: auto;
   -webkit-filter: drop-shadow(0px 0px 1px #000) drop-shadow(0px 0px 1px #000);
           filter: drop-shadow(0px 0px 1px #000) drop-shadow(0px 0px 1px #000);
 }
@@ -36,7 +37,7 @@
 .block-end {
   text-align: center;
   border-radius: 20px;
-  width: 200px;
+  width: 30px;
 }
 
 .block-io {
@@ -63,7 +64,47 @@
   right: -30px;
 }
 
+.block-wrapper {
+  background-color: #6124000a;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.if-wrapper {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: [false] auto [true] auto [end];
+      grid-template-columns: [false] auto [true] auto [end];
+  grid-templete-rows: 50px auto;
+}
+
+.if-true-wrapper,
+.if-false-wrapper {
+  -ms-grid-row: 2;
+  -ms-grid-row-span: 1;
+  grid-row: 2 / span 1;
+  margin: 10px;
+  padding: 0 20px;
+}
+
+.if-true-wrapper {
+  grid-column: true / span 1;
+}
+
+.if-false-wrapper {
+  grid-column: false / span 1;
+}
+
 .block-if {
+  grid-column: 1 / end;
+  -ms-grid-row: 1;
+  -ms-grid-row-span: 1;
+  grid-row: 1 / span 1;
   height: 40px;
   padding: 0;
   line-height: 40px;
@@ -88,21 +129,5 @@
   border-color: transparent transparent transparent #fdebba;
   position: absolute;
   right: -30px;
-}
-
-.block-wrapper {
-  background-color: #00000011;
-  position: relative;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
-}
-
-.if-wrapper {
-  padding: 10px 40px;
 }
 /*# sourceMappingURL=blocks.css.map */

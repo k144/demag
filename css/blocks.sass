@@ -7,6 +7,7 @@ $block-background: #fdebba
     box-sizing: border-box
 
 #blocks
+    position: relative
     display: flex
     flex-direction: column
     margin: 0 auto
@@ -14,19 +15,19 @@ $block-background: #fdebba
     padding: 40px
 
 .block
+    font-size: 10px
     display: block
-    position: relative
-    padding: 10px
+    padding: 18px
     background: $block-background
-    margin: 20px auto
-    position: relative
+    margin: 10px auto
+    width: auto
     filter: drop-shadow(0px 0px 1px #000) drop-shadow(0px 0px 1px #000)
 
 .block-start,
 .block-end
     text-align: center
     border-radius: 20px
-    width: 200px
+    width: 30px
 
 .block-io
     min-height: 40px
@@ -47,7 +48,32 @@ $block-background: #fdebba
         position: absolute
         right: -30px
 
+.block-wrapper
+    background-color: #6124000a
+    display: flex
+    flex-direction: column
+
+.if-wrapper
+    display: grid
+    grid-template-columns: [false] auto [true] auto [end]
+    grid-templete-rows: 50px auto
+
+.if-true-wrapper,
+.if-false-wrapper
+    grid-row: 2 / span 1
+    margin: 10px
+    padding: 0 20px
+
+.if-true-wrapper
+    grid-column: true / span 1
+
+.if-false-wrapper
+    grid-column: false / span 1
+
+
 .block-if
+    grid-column: 1 / end
+    grid-row: 1 / span 1
     height: 40px
     padding: 0
     line-height: 40px
@@ -62,7 +88,6 @@ $block-background: #fdebba
         border-color: transparent $block-background transparent transparent
         position: absolute
         left: -30px
-
     &:after
         content: ""
         border-style: solid
@@ -70,12 +95,3 @@ $block-background: #fdebba
         border-color: transparent transparent transparent $block-background
         position: absolute
         right: -30px
-
-.block-wrapper
-    background-color: #00000011
-    position: relative
-    display: flex
-    flex-direction: column
-
-.if-wrapper
-    padding: 10px 40px

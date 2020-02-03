@@ -8,14 +8,27 @@ $("#dl-button").click(() => {
 })
 
 function download() {
-	Blocks.forEach((block, i) => {
-		if (block.type == "wrapper-open" || block.type == "wrapper-close"){
-			Blocks.splice(i, 1);
+	let blocks = new Array();
+
+	for (let i = 0; i < Blocks.length; i++) {
+		let block = Blocks[i];
+		let blockID = block.ID;
+
+		// bloczki bez ID to wrappery
+		if (blockID == undefined) {
+			continue;
 		}
-	})
+
+		let blockDiv = document.getElementById(blockID);
+		block.X = blockDiv.offsetLeft;
+		block.Y = blockDiv.offsetTop;
+		blocks.push(block);
+	}
+
+	console.log(blocks);
 
     let JSONdata = new Blob(
-        [JSON.stringify(Blocks)],
+        [JSON.stringify(blocks)],
         {type: "text/plain;charset=utf-8"}
     );
     let fileReader = new FileReader();
@@ -38,5 +51,4 @@ function download() {
 		console.log(decodedBlob)
 		saveAs(decodedBlob, "test.alg");
     }
-
 }

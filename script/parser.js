@@ -12,6 +12,17 @@ function editorHandler(editor){
     parse(editorContent);
 }
 
+function preproc(lines){
+    let result = new Array(lines.length);
+    for (let i = 0; i < lines.length; i++){
+        let line = lines[i];
+        line = line.replace(/(\w+\s*)=(?!=)/, "$1:=");
+        result[i] = line;
+    }
+    console.log(result);
+    return result;
+}
+
 function getLineType(line) {
     let typeMap = new Map([
         [/^\s*\}\s*$/,                "close-bracket"],
@@ -85,6 +96,10 @@ function parseLines(lines){
                         .replace(/(if)\s*/, "")
                         .replace(/\s*\{\s*$/, ""),
                     outB: CurrentID + 1
+                },
+                {
+                    type: "wrapper-open",
+                    wrapperType: "if-true"
                 }
             )
             ifStack.push({head: blocks.length - 1}); // pozycja tego bloczka warunkowego w tablicy bloczków
@@ -93,12 +108,26 @@ function parseLines(lines){
         case "else":
             ifStack[ifStack.length - 1]
                 .lastTrue = CurrentID
+            blocks.push(
+                {
+                    type: "wrapper-close"
+                },
+                {
+                    type: "wrapper-open",
+                    wrapperType: "if-false"
+                }
+            )
             break;
     
         case "close-bracket":
-            blocks.push({
-                type: "wrapper-close"
-            })
+            blocks.push(
+                {
+                    type: "wrapper-close"
+                },
+                {
+                    type: "wrapper-close"
+                }
+            )
 
             let thisIf = ifStack.pop();
 
@@ -106,7 +135,7 @@ function parseLines(lines){
                 .outA = thisIf.lastTrue + 1;
 
             blocks[thisIf.lastTrue]
-                .outA = CurrentID + 1
+                .outA = CurrentID + 1;
 
             break;
         }
@@ -116,6 +145,7 @@ function parseLines(lines){
 
 function parse(mag) {
     let lines = mag.split("\n");
+    lines = preproc(lines);
     let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
     CurrentID = 0;
     blocks.push({
@@ -123,7 +153,7 @@ function parse(mag) {
 		"width": 0,
 		"height": 0,
 		"type": "start",
-		"content": "start",
+		"content": "START",
 		"outA": 1,
 		"outB": outNull
 	})
@@ -136,7 +166,7 @@ function parse(mag) {
         "width": 0,
         "height": 0,
         "type": "end",
-        "content": "koniec",
+        "content": "KONIEC",
         "outA": outNull,
         "outB": outNull
     })
