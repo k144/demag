@@ -19,6 +19,7 @@
   width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
+  padding: 20px 0;
 }
 
 .block {
@@ -36,7 +37,10 @@
 .block-end {
   text-align: center;
   border-radius: 20px;
-  width: 30px;
+  width: 70px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0;
 }
 
 .block-sum {
