@@ -16,6 +16,7 @@ function preproc(lines){
     let result = new Array(lines.length);
     for (let i = 0; i < lines.length; i++){
         let line = lines[i];
+        line = line.replace(/^\s*/, "");
         line = line.replace(/(\w+\s*)=(?!=)/, "$1:=");
         result[i] = line;
     }
@@ -41,9 +42,6 @@ function getLineType(line) {
     
 }
 
-const outNull = 4294967295; // tak oznaczone jest puste wyjście bloczka
-const blockOffset = 100;
-
 function parseLines(lines){
     let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
     let ifStack = new Array();
@@ -61,8 +59,7 @@ function parseLines(lines){
                 ID: CurrentID,
                 type: lineType,
                 content: line,
-                outA: CurrentID + 1,
-                outB: outNull,
+                outA: CurrentID + 1
             };
             blocks.push(block);
             break;
@@ -75,8 +72,7 @@ function parseLines(lines){
                 ID: CurrentID,
                 type: lineType,
                 content: line,
-                outA: CurrentID + 1,
-                outB: outNull,
+                outA: CurrentID + 1
             }
             blocks.push(block);
             break;
@@ -102,13 +98,22 @@ function parseLines(lines){
                     wrapperType: "if-true"
                 }
             )
-            ifStack.push({head: blocks.length - 1}); // pozycja tego bloczka warunkowego w tablicy bloczków
+            ifStack.push({head: blocks.length - 2}); // pozycja tego bloczka warunkowego w tablicy bloczków
             break;
         
         case "else":
+            CurrentID++;
             ifStack[ifStack.length - 1]
-                .lastTrue = CurrentID
+                .lastTrue = {
+                    ID: CurrentID,
+                    position: blocks.length
+                };
             blocks.push(
+                {
+                    ID: CurrentID,
+                    type: "sum",
+                    content: ""
+                },
                 {
                     type: "wrapper-close"
                 },
@@ -120,7 +125,14 @@ function parseLines(lines){
             break;
     
         case "close-bracket":
+            CurrentID++;
             blocks.push(
+                {
+                    ID: CurrentID,
+                    type: "sum",
+                    content: "",
+                    outA: CurrentID + 1
+                },
                 {
                     type: "wrapper-close"
                 },
@@ -132,10 +144,13 @@ function parseLines(lines){
             let thisIf = ifStack.pop();
 
             blocks[thisIf.head]
-                .outA = thisIf.lastTrue + 1;
-
-            blocks[thisIf.lastTrue]
+                .outA = thisIf.lastTrue.ID + 1;
+            
+            console.log(thisIf);
+            console.log(blocks);
+            blocks[thisIf.lastTrue.position]
                 .outA = CurrentID + 1;
+            console.log(blocks[thisIf.lastTrue.position]);
 
             break;
         }
@@ -154,8 +169,7 @@ function parse(mag) {
 		"height": 0,
 		"type": "start",
 		"content": "START",
-		"outA": 1,
-		"outB": outNull
+		"outA": 1
 	})
 
     blocks.push.apply(blocks, parseLines(lines));
@@ -166,9 +180,7 @@ function parse(mag) {
         "width": 0,
         "height": 0,
         "type": "end",
-        "content": "KONIEC",
-        "outA": outNull,
-        "outB": outNull
+        "content": "KONIEC"
     })
     
     console.log(blocks);

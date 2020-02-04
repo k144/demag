@@ -1,4 +1,5 @@
 $nav-height: 40px
+
 body
     margin: 0
     font-size: 15px
@@ -8,7 +9,6 @@ body
 .CodeMirror
     height: 100%
     max-height: 100vh
-
 
 #main-wrapper
     display: grid
@@ -30,38 +30,44 @@ nav
     background: #ddd
     font-family: monospace
     user-select: none
+
     input
         visibility: hidden
         display: none
         width: 0
         margin: 0
+
         & + label
             color: #444
             padding: 0 15px
             line-height: $nav-height
             transition: all 100ms
             text-align: center
+
         &:checked + label
             background: #fff
             color: #222
+
         &:hover + label
             background: #ccc
+
         &:checked:hover + label
             background: #fff
             color: #222
-                
+
 #output-wrapper
     grid-column: 2
     grid-row: 2
     overflow-y: auto
+
     #json
         display: block
         padding: 15px
-    
 
 #dl-wrapper
     grid-column: 2
     grid-row: 3
+
     #dl-button
         display: block
         margin: auto

@@ -22,6 +22,14 @@ function download() {
 		let blockDiv = document.getElementById(blockID);
 		block.X = blockDiv.offsetLeft;
 		block.Y = blockDiv.offsetTop;
+
+		const noOut = 4294967295; // tak oznaczone jest puste wyjście bloczka
+		if (block.outA == undefined) {
+			block.outA = noOut;
+		}
+		if (block.outB == undefined) {
+			block.outB = noOut;
+		}
 		blocks.push(block);
 	}
 
@@ -39,7 +47,7 @@ function download() {
 		let arrayBuffer = fileReader.result;
 		let arr = new Uint8Array(arrayBuffer);
 		console.log("arr:", arr);
-		let decodedData = new Uint8Array(10000);
+		let decodedData = new Uint8Array(1000000);
 		console.log("puste:", decodedData);
 		bytesCopied = jalg(arr, decodedData);
 		decodedData = decodedData.slice(0, bytesCopied)

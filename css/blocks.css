@@ -19,7 +19,6 @@
   width: -webkit-max-content;
   width: -moz-max-content;
   width: max-content;
-  padding: 40px;
 }
 
 .block {
@@ -38,6 +37,13 @@
   text-align: center;
   border-radius: 20px;
   width: 30px;
+}
+
+.block-sum {
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
 }
 
 .block-io {
@@ -73,6 +79,9 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }
 
 .if-wrapper {
@@ -110,7 +119,7 @@
   line-height: 40px;
   text-align: center;
   margin: 20px auto;
-  postition: relative;
+  position: relative;
 }
 
 .block-if:before {

@@ -12,7 +12,6 @@ $block-background: #fdebba
     flex-direction: column
     margin: 0 auto
     width: max-content
-    padding: 40px
 
 .block
     font-size: 10px
@@ -29,10 +28,17 @@ $block-background: #fdebba
     border-radius: 20px
     width: 30px
 
+.block-sum
+    padding: 0
+    width: 20px
+    height: 20px
+    border-radius: 100%
+
 .block-io
     min-height: 40px
     line-height: 40px
     padding: 0
+
     &:before
         content: ""
         border-style: solid
@@ -40,6 +46,7 @@ $block-background: #fdebba
         border-color: transparent $block-background $block-background transparent
         position: absolute
         left: -30px
+
     &:after
         content: ""
         border-style: solid
@@ -52,6 +59,7 @@ $block-background: #fdebba
     background-color: #6124000a
     display: flex
     flex-direction: column
+    justify-content: space-between
 
 .if-wrapper
     display: grid
@@ -70,7 +78,6 @@ $block-background: #fdebba
 .if-false-wrapper
     grid-column: false / span 1
 
-
 .block-if
     grid-column: 1 / end
     grid-row: 1 / span 1
@@ -79,7 +86,7 @@ $block-background: #fdebba
     line-height: 40px
     text-align: center
     margin: 20px auto
-    postition: relative
+    position: relative
     //box-sizing: border-box
     &:before
         content: ""
