@@ -15,9 +15,33 @@ function editorHandler(editor){
 function preproc(lines){
     let result = new Array(lines.length);
     for (let i = 0; i < lines.length; i++){
+
         let line = lines[i];
-        line = line.replace(/^\s*/, "");
-        line = line.replace(/(\w+\s*)=(?!=)/, "$1:=");
+        let replaceMap = new Map([
+            [/^\s*/, ""], // usuwa znaki białe na początku
+            [/\s*$/, ""], // -,,- na końcu
+            [/(\w+\s*)=(?!=)/, "$1:="], // = -> :=
+            // x += 1    ->     x := x + 1   itd.
+            [
+                /^([a-zA-Z]\w*)(\s*)([\+\-\*\/\^])=(\s*)(.*)$/,
+                "$1" +     // zmienna
+                "$2:=$2" + // [znaki białe]:=[znaki białe]
+                "$1" +     // zmienna
+                "$4" +     // znaki białe po `=`
+                "$3" +     // operator
+                "$4" +     // znaki białe po `=`
+                "$5"       // reszta
+            ],
+            [/^(\w+)\+\+$/, "$1 := $1+1"], // x++   ->   x := x+1
+            [/^(\w+)\-\-$/, "$1 := $1-1"], // x--   ->   x := x-1
+
+        ]);
+        for (let entry of replaceMap){
+            let regExp = entry[0];
+            let out = entry[1];
+            line = line.replace(regExp, out);
+        }
+
         result[i] = line;
     }
     console.log(result);
@@ -26,11 +50,13 @@ function preproc(lines){
 
 function getLineType(line) {
     let typeMap = new Map([
-        [/^\s*\}\s*$/,                "close-bracket"],
-        [/^\s*[a-zA-Z]+\w*\s*(=|:=)/, "data"],
-        [/^\s*(read|write)\s+/,       "io"],
-        [/^\s*(if)\s+.*\{\s*$/,       "if"],
-        [/^\s*\}\s*(else)\s*\{\s*$/,  "else"]
+        [/^\}$/,                "close-bracket"],
+        [/^[a-zA-Z]\w*\s*:=/,   "data"],
+        [/^(read|write)+/,      "io"],
+        [/^(if)\s+.*\{$/,       "if"],
+        [/^\}\s*(else)\s*\{$/,  "else"],
+        [/^\w*:$/,              "goto-label"],
+        [/^goto\s+./,           "goto-call"]
     ]);
     for (let entry of typeMap) {
         let regExp = entry[0];
@@ -46,7 +72,10 @@ function parseLines(lines){
     let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
     let ifStack = new Array();
 
-    lines.forEach((line, i)=>{
+    let gotoLabelMap = new Map();
+    let gotoCallMap = new Map();
+
+    lines.forEach((line)=>{
 
         let lineType = getLineType(line);
         let block = new Object();
@@ -146,16 +175,47 @@ function parseLines(lines){
             blocks[thisIf.head]
                 .outA = thisIf.lastTrue.ID + 1;
             
-            console.log(thisIf);
-            console.log(blocks);
             blocks[thisIf.lastTrue.position]
                 .outA = CurrentID + 1;
-            console.log(blocks[thisIf.lastTrue.position]);
 
             break;
+        
+        case "goto-label":
+            CurrentID++;
+            blocks.push(
+                {
+                    ID: CurrentID,
+                    type: "sum",
+                    content: "",
+                    outA: CurrentID + 1
+                }
+            );
+            line = line.replace(":", "");
+            gotoLabelMap.set(line, CurrentID)
+            break;
+        case "goto-call":
+            CurrentID++;
+            blocks.push(
+                {
+                    ID: CurrentID,
+                    type: "sum",
+                    content: "",
+                }
+            );
+            let target = line.replace(/goto\s*/, "");
+            gotoCallMap.set(blocks.length-1, target);
+            break;
         }
+
+        // łączy etykiety z instrukcjami goto 
+        for (let elem of gotoCallMap){
+            let call = elem[0];
+            let label = elem[1];
+            blocks[call].outA = gotoLabelMap.get(label);
+        }
+
     })
-    return blocks
+    return blocks;
 }
 
 function parse(mag) {
@@ -183,8 +243,6 @@ function parse(mag) {
         "content": "KONIEC"
     })
     
-    console.log(blocks);
-
     Blocks = blocks; // "upublicznia" bloczki
     let output = new Array();
     blocks.forEach((block) => output.push(
