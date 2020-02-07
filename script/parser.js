@@ -17,10 +17,9 @@ function preproc(lines){
     for (let i = 0; i < lines.length; i++){
 
         let line = lines[i];
+        line = line.trim(); // usuwa znaki białe na początku i końcu
         let replaceMap = new Map([
-            [/^\s*/, ""], // usuwa znaki białe na początku
-            [/\s*$/, ""], // -,,- na końcu
-            [/(\w+\s*)=(?!=)/, "$1:="], // = -> :=
+            [/^([^=:\+\-\*\/\^]*)=(?!=)/, "$1:="], // = -> :=
             // x += 1    ->     x := x + 1   itd.
             [
                 /^([a-zA-Z]\w*)(\s*)([\+\-\*\/\^])=(\s*)(.*)$/,
@@ -51,10 +50,12 @@ function preproc(lines){
 function getLineType(line) {
     let typeMap = new Map([
         [/^\}$/,                "close-bracket"],
-        [/^[a-zA-Z]\w*\s*:=/,   "data"],
+        [/^(([a-zA-Z]\w*\s*:=)|((dim)(set)\s+))/,   "data"],
         [/^(read|write)+/,      "io"],
-        [/^(if)\s+.*\{$/,       "if"],
-        [/^\}\s*(else)\s*\{$/,  "else"],
+        [/^if\s+.*\{$/,       "if"],
+        [/^\}\s*else\s*\{$/,  "else"],
+        [/^for\s+.*;.*;.*\{/, "for"],
+        [/^for\s+[a-zA-Z]\w*\s+range.*\{/, "for-range"],
         [/^\w*:$/,              "goto-label"],
         [/^goto\s+./,           "goto-call"]
     ]);
@@ -70,7 +71,7 @@ function getLineType(line) {
 
 function parseLines(lines){
     let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
-    let ifStack = new Array();
+    let stack = new Array();
 
     let gotoLabelMap = new Map();
     let gotoCallMap = new Map();
@@ -78,43 +79,41 @@ function parseLines(lines){
     lines.forEach((line)=>{
 
         let lineType = getLineType(line);
-        let block = new Object();
 
         switch(lineType) {
         // bloczek danych
         case "data":
-            CurrentID++;
-            block = {
-                ID: CurrentID,
-                type: lineType,
-                content: line,
-                outA: CurrentID + 1
-            };
-            blocks.push(block);
+            blocks.push(
+                {
+                    ID: CurrentID++,
+                    type: lineType,
+                    content: line,
+                    outA: CurrentID + 1
+                }
+            )
             break;
 
 
         // bloczek wejścia wyjścia
         case "io":
-            CurrentID++;
-            block = {
-                ID: CurrentID,
-                type: lineType,
-                content: line,
-                outA: CurrentID + 1
-            }
-            blocks.push(block);
+            blocks.push(
+                {
+                    ID: CurrentID++,
+                    type: lineType,
+                    content: line,
+                    outA: CurrentID + 1
+                }    
+            );
             break;
 
         case "if":
-            CurrentID++;
             blocks.push(
                 {
                     type: "wrapper-open",
                     wrapperType: "if"
                 },
                 {
-                    ID: CurrentID,
+                    ID: CurrentID++,
                     type: lineType,
                     content: line
                         // usuwa `if` i `{` oraz znaki białe wokół nich
@@ -126,17 +125,24 @@ function parseLines(lines){
                     type: "wrapper-open",
                     wrapperType: "if-true"
                 }
-            )
-            ifStack.push({head: blocks.length - 2}); // pozycja tego bloczka warunkowego w tablicy bloczków
+            );
+            stack.push(
+                {
+                    type: "if",
+                    head: blocks.length - 2, // pozycja tego bloczka warunkowego w tablicy bloczków
+                }
+            );
             break;
         
         case "else":
             CurrentID++;
-            ifStack[ifStack.length - 1]
+            stack[stack.length - 1]
                 .lastTrue = {
                     ID: CurrentID,
                     position: blocks.length
                 };
+            stack[stack.length - 1]
+                .hasElse = true;
             blocks.push(
                 {
                     ID: CurrentID,
@@ -150,34 +156,144 @@ function parseLines(lines){
                     type: "wrapper-open",
                     wrapperType: "if-false"
                 }
-            )
+            );
             break;
-    
-        case "close-bracket":
-            CurrentID++;
+
+        case "for":
+            let [all, initialization, condition, afterthought]
+                = /for\s+(.*);\s*(.*);\s*(.*)\{/.exec(line);
+            [initialization, afterthought]
+                = preproc([initialization, afterthought]);
             blocks.push(
                 {
-                    ID: CurrentID,
-                    type: "sum",
-                    content: "",
+                    ID: CurrentID++,
+                    type: "data",
+                    content: initialization,
                     outA: CurrentID + 1
                 },
                 {
-                    type: "wrapper-close"
+                    type: "wrapper-open",
+                    wrapperType: "for"
                 },
                 {
-                    type: "wrapper-close"
+                    type: "wrapper-open",
+                    wrapperType: "for-body"
+                },
+                {
+                    ID: CurrentID++,
+                    type: "if",
+                    content: condition,
+                    outB: CurrentID + 1,
                 }
-            )
+            );
+            stack.push(
+                {
+                    type: "for",
+                    condition: {
+                        ID: CurrentID,
+                        position: blocks.length-1,
+                    },
+                    afterthought: afterthought
+                }
+            );
+            break;
+    
+        case "for-range":
+            blocks.push(
+                {
+                    type: "if",
+                    content: "range"
+                }
+            );
+            break;
 
-            let thisIf = ifStack.pop();
-
-            blocks[thisIf.head]
-                .outA = thisIf.lastTrue.ID + 1;
-            
-            blocks[thisIf.lastTrue.position]
-                .outA = CurrentID + 1;
-
+        case "close-bracket":
+            let thisStackElement = stack.pop();
+            console.log(thisStackElement);
+            if (thisStackElement.type == "if"){
+                CurrentID++;
+                blocks.push(
+                    {
+                        ID: CurrentID,
+                        type: "sum",
+                        content: "",
+                        outA: CurrentID + 1
+                    },
+                    {
+                        type: "wrapper-close"
+                    }
+                );
+                if (thisStackElement.hasElse) {
+                    blocks.push(
+                        {
+                            type: "wrapper-close"
+                        }
+                    );
+                    blocks[thisStackElement.head]
+                        .outA = thisStackElement.lastTrue.ID + 1;
+                    blocks[thisStackElement.lastTrue.position]
+                        .outA = CurrentID + 1;
+                } else {
+                    blocks.push(
+                        {
+                            type: "wrapper-open",
+                            wrapperType: "if-false"
+                        },
+                        {
+                            ID: CurrentID++,
+                            type: "sum",
+                            content: "",
+                            outA: CurrentID + 1
+                        },
+                        {
+                            type: "wrapper-close"
+                        },
+                        {
+                            type: "wrapper-close"
+                        }
+                    );
+                    blocks[thisStackElement.head]
+                        .outA = thisStackElement.lastTrue.ID + 1;
+                    blocks[thisStackElement.lastTrue.position]
+                        .outA = CurrentID + 1;
+                }
+            } else if (thisStackElement.type == "for"){
+                blocks.push(
+                    {
+                        ID: CurrentID++,
+                        type: "data",
+                        content: thisStackElement.afterthought,
+                        outA: CurrentID + 1
+                    },
+                    {
+                        type: "wrapper-close"
+                    },
+                    {
+                        type: "wrapper-open",
+                        wrapperType: "for-sum"
+                    },
+                    {
+                        ID: CurrentID++,
+                        type: "sum",
+                        content: "",
+                        outA: CurrentID + 1
+                    },
+                    {
+                        ID: CurrentID++,
+                        type: "sum",
+                        content: "",
+                        outA: thisStackElement.condition.ID
+                    },
+                    {
+                        type: "wrapper-close"
+                    },
+                    {
+                        type: "wrapper-close"
+                    }
+                );
+                blocks[thisStackElement.condition.position]
+                    .outA = CurrentID + 1;
+            }
             break;
         
         case "goto-label":
@@ -193,6 +309,7 @@ function parseLines(lines){
             line = line.replace(":", "");
             gotoLabelMap.set(line, CurrentID)
             break;
+
         case "goto-call":
             CurrentID++;
             blocks.push(
@@ -215,6 +332,7 @@ function parseLines(lines){
         }
 
     })
+    console.log(blocks);
     return blocks;
 }
 
