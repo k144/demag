@@ -83,22 +83,24 @@ function parseLines(lines){
         switch(lineType) {
         // bloczek danych
         case "data":
+            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID++,
+                    ID: CurrentID,
                     type: lineType,
                     content: line,
                     outA: CurrentID + 1
                 }
-            )
+            );
             break;
 
 
         // bloczek wejścia wyjścia
         case "io":
+            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID++,
+                    ID: CurrentID,
                     type: lineType,
                     content: line,
                     outA: CurrentID + 1
@@ -107,13 +109,14 @@ function parseLines(lines){
             break;
 
         case "if":
+            CurrentID++;
             blocks.push(
                 {
                     type: "wrapper-open",
                     wrapperType: "if"
                 },
                 {
-                    ID: CurrentID++,
+                    ID: CurrentID,
                     type: lineType,
                     content: line
                         // usuwa `if` i `{` oraz znaki białe wokół nich
@@ -164,9 +167,10 @@ function parseLines(lines){
                 = /for\s+(.*);\s*(.*);\s*(.*)\{/.exec(line);
             [initialization, afterthought]
                 = preproc([initialization, afterthought]);
+            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID++,
+                    ID: CurrentID,
                     type: "data",
                     content: initialization,
                     outA: CurrentID + 1
@@ -178,14 +182,17 @@ function parseLines(lines){
                 {
                     type: "wrapper-open",
                     wrapperType: "for-body"
-                },
+                }
+            );
+            CurrentID++;
+            blocks.push(
                 {
-                    ID: CurrentID++,
+                    ID: CurrentID,
                     type: "if",
                     content: condition,
                     outB: CurrentID + 1,
                 }
-            );
+            )
             stack.push(
                 {
                     type: "for",
@@ -234,13 +241,14 @@ function parseLines(lines){
                     blocks[thisStackElement.lastTrue.position]
                         .outA = CurrentID + 1;
                 } else {
+                    CurrentID++;
                     blocks.push(
                         {
                             type: "wrapper-open",
                             wrapperType: "if-false"
                         },
                         {
-                            ID: CurrentID++,
+                            ID: CurrentID,
                             type: "sum",
                             content: "",
                             outA: CurrentID + 1
@@ -253,14 +261,15 @@ function parseLines(lines){
                         }
                     );
                     blocks[thisStackElement.head]
-                        .outA = thisStackElement.lastTrue.ID + 1;
-                    blocks[thisStackElement.lastTrue.position]
+                        .outA = CurrentID;
+                    blocks[blocks.length-6]
                         .outA = CurrentID + 1;
                 }
             } else if (thisStackElement.type == "for"){
+                CurrentID++
                 blocks.push(
                     {
-                        ID: CurrentID++,
+                        ID: CurrentID,
                         type: "data",
                         content: thisStackElement.afterthought,
                         outA: CurrentID + 1
@@ -271,15 +280,21 @@ function parseLines(lines){
                     {
                         type: "wrapper-open",
                         wrapperType: "for-sum"
-                    },
+                    }
+                );
+                CurrentID++;
+                blocks.push(
                     {
-                        ID: CurrentID++,
+                        ID: CurrentID,
                         type: "sum",
                         content: "",
                         outA: CurrentID + 1
-                    },
+                    }
+                )
+                CurrentID++;
+                blocks.push(
                     {
-                        ID: CurrentID++,
+                        ID: CurrentID,
                         type: "sum",
                         content: "",
                         outA: thisStackElement.condition.ID
