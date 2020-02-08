@@ -153,13 +153,14 @@
       -ms-flex-direction: row;
           flex-direction: row;
   margin-left: 300px;
+  margin-right: 10px;
 }
 
 .for-body-wrapper {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  margin-right: 20px;
+  padding-right: 20px;
 }
 
 .for-body-wrapper .block-if {
