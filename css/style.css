@@ -112,10 +112,7 @@ nav input:checked:hover + label {
 }
 
 .overlay {
-  background-image: url("/logo.gif");
-  background-repeat: no-repeat;
-  background-size: contain;
-  width: 900px;
+  min-width: 80%;
   height: 200px;
   position: fixed;
   top: 50%;
