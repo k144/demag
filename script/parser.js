@@ -55,7 +55,7 @@ function preproc(lines){
 function getLineType(line) {
     let typeMap = new Map([
         [/^\}$/,                                  "close-bracket"],
-        [/^(([a-zA-Z]\w*\s*:=)|((dim)(set)\s+))/, "data"],
+        [/^(([a-zA-Z]\w*\s*:=)|((dim)|(set)\s+))/, "data"],
         [/^(read|write)+/,                        "io"],
         [/^if\s+.*\{$/,                           "if"],
         [/^\}\s*else\s*\{$/,                      "else"],
