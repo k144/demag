@@ -33,6 +33,11 @@ function preproc(lines){
             ],
             [/^(\w+)\+\+$/, "$1 := $1+1"], // x++   ->   x := x+1
             [/^(\w+)\-\-$/, "$1 := $1-1"], // x--   ->   x := x-1
+            // for i = 0 -> 4 {    ->     for i:=0; i<=4; i := i + 1 {   
+            [
+                /^for\s+([a-zA-Z]\w*)\s*:=\s*(\w+)\s*\->\s*(\w+)\s*\{/,
+                "for $1:=$2; $1<=$3; $1 := $1+1 {"
+            ]
 
         ]);
         for (let entry of replaceMap){
@@ -49,15 +54,14 @@ function preproc(lines){
 
 function getLineType(line) {
     let typeMap = new Map([
-        [/^\}$/,                "close-bracket"],
-        [/^(([a-zA-Z]\w*\s*:=)|((dim)(set)\s+))/,   "data"],
-        [/^(read|write)+/,      "io"],
-        [/^if\s+.*\{$/,       "if"],
-        [/^\}\s*else\s*\{$/,  "else"],
-        [/^for\s+.*;.*;.*\{/, "for"],
-        [/^for\s+[a-zA-Z]\w*\s+range.*\{/, "for-range"],
-        [/^\w*:$/,              "goto-label"],
-        [/^goto\s+./,           "goto-call"]
+        [/^\}$/,                                  "close-bracket"],
+        [/^(([a-zA-Z]\w*\s*:=)|((dim)(set)\s+))/, "data"],
+        [/^(read|write)+/,                        "io"],
+        [/^if\s+.*\{$/,                           "if"],
+        [/^\}\s*else\s*\{$/,                      "else"],
+        [/^for\s+.*;.*;.*\{/,                     "for"],
+        [/^\w*:$/,                                "goto-label"],
+        [/^goto\s+./,                             "goto-call"]
     ]);
     for (let entry of typeMap) {
         let regExp = entry[0];
