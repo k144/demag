@@ -179,7 +179,7 @@ if odp == liczba {
 ```
 Program zakończy się dopiero kiedy użytkownik odgadnie zmienną `liczba`, w przeciwnym wypadku powróci do wczytania zmiennej `odp`.
 
-**Instrukcja `goto` na końcu instrukcji warunkowej może zostawiać zbędne bloczki sumacyjne. Algorytm wykona się poprawnie ale będzie wypadało posprzątać.**
+**Instrukcja `goto` na końcu instrukcji warunkowej może zostawiać zbędne bloczki sumacyjne. Algorytm wykona się poprawnie, ale będzie wypadało posprzątać.**
 
 ## Jak to działa?
 
@@ -189,7 +189,7 @@ Tak przygotowane dane w formacie JSON zostają przekazane programowi **jalg**.
 Zamienia on reprezentację bloczków w JSON na format *.alg*, wspierany przez Magiczne Bloczki®.
 **Jalg** został napisany w języku programowania [Go](https://pl.wikipedia.org/wiki/Go_(j%C4%99zyk_programowania)), oraz skompilowany do [WebAssembly](https://pl.wikipedia.org/wiki/WebAssembly).
 
-Cały proces odbywa się całkowicie w przeglądarce.
+Cały proces odbywa się w przeglądarce.
 
 ## Po co?
 
