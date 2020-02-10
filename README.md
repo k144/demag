@@ -86,7 +86,7 @@ to to samo, co:
 x = x + 10
 ```
 
-`x *= 2.5` pomnoży `x` przez 2,5 i przypisze mu tę wartość.
+`x *= 2.5` pomnoży `x` przez 2,5 i przypisze mu tą wartość.
 
 Po każdym z tych operatorów może znaleźć się więcej operacji arytmetycznych, np.:
 
