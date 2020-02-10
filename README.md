@@ -130,7 +130,7 @@ Operatory logiczne są takie same jak w Magicznych Bloczkach®, czyli:
 - `<=`, `=<` - mniejsze lub równe
 - `>=`. `=>` - większe lub równe
 - `<` - mniejsze niż
-- `>` - większe niz
+- `>` - większe niż
 
 ### Pętle
 
@@ -183,7 +183,7 @@ Program zakończy się dopiero kiedy użytkownik odgadnie zmienną `liczba`, w p
 
 ## Jak to działa?
 
-Edytor kodu na stronie ([CodeMirror](https://codemirror.net/)) przy każdej zmianie swojej treści przekazuje ją funkcji `parse()`. Zamiania ona magscript na JSON (JavaScript Object Notation), oraz pośrednio umieszcza reprezentację bloczków na prawiej części strony. Przy pobieraniu z tej graficznej reprezentacji odczytywana jest pozycja każdego bloczka i usuwane są zbędne informacje.
+Edytor kodu na stronie ([CodeMirror](https://codemirror.net/)) przy każdej zmianie swojej treści przekazuje ją funkcji `parse()`. Zamienia ona magscript na JSON (JavaScript Object Notation), oraz pośrednio umieszcza reprezentację bloczków na prawej części strony. Przy pobieraniu z tej graficznej reprezentacji odczytywana jest pozycja każdego bloczka i usuwane są zbędne informacje.
 
 Tak przygotowane dane w formacie JSON zostają przekazane programowi **jalg**.
 Zamienia on reprezentację bloczków w JSON na format *.alg*, wspierany przez Magiczne Bloczki®.
