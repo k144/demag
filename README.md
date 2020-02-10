@@ -15,11 +15,11 @@ Znaki białe na początku linii nie mają znaczenia. Na końcu linii **nie** mus
 ### Deklaracja zmiennych
 
 ```
-	x = 5
-	y = 12 + x
-	set tablica = (1,2,3)
-	set macierz = ((2,3,11),(25,1,12),(2,42,-2))
-	z=tablica[2]+macierz[3,2]
+x = 5
+y = 12 + x
+set tablica = (1,2,3)
+set macierz = ((2,3,11),(25,1,12),(2,42,-2))
+z=tablica[2]+macierz[3,2]
 ```
 W powyższym przykładzie wartości poszczególnych zmiennych to:
 - `x` → `5`
