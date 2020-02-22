@@ -1,6 +1,6 @@
 /*--- ZMIENNE GLOBALNE ---*/
 var Blocks = new Array(); // bloczki dostępne publicznie
-var CurrentID = 0;
+let CurrentID = 0;
 
 // tworzy bloczki startu i końca po załadowniu strony
 $(() => parse("")) 
@@ -12,11 +12,10 @@ function editorHandler(editor){
     parse(editorContent);
 }
 
+/** Usuwa zbędne znaki, oraz rozwija wybrane wyrażenia, np. `++` */
 function preproc(lines){
-    let result = new Array(lines.length);
-    for (let i = 0; i < lines.length; i++){
-
-        let line = lines[i];
+    let result = new Array();
+    for (let line of lines){
         line = line.trim(); // usuwa znaki białe na początku i końcu
         let replaceMap = new Map([
             [/^(.*[^=:\+\-\*\/\^])=(?!=)/, "$1:="], // = -> :=
@@ -45,8 +44,7 @@ function preproc(lines){
             let out = entry[1];
             line = line.replace(regExp, out);
         }
-
-        result[i] = line;
+        result.push(line);
     }
     console.log(result);
     return result;
@@ -73,24 +71,114 @@ function getLineType(line) {
     
 }
 
+/**
+ * Zamyka odpowiednie wrappery i modyfikuje bloczki.
+ * Ten fragment jest dosyć długi, więc został przeniesiony
+ * do osobnej funkcji. Zwraca przetworzone bloczki.
+ * */
+function closeBracket(blocks, thisStackElement){
+    if (thisStackElement.type == "if") {
+        blocks.push(
+            {
+                ID: ++CurrentID,
+                type: "sum",
+                content: "",
+                outA: CurrentID + 1
+            },
+            {
+                type: "wrapper-close"
+            }
+        );
+        if (thisStackElement.hasElse) {
+            blocks.push(
+                {
+                    type: "wrapper-close"
+                }
+            );
+            blocks[thisStackElement.head]
+                .outA = thisStackElement.lastTrue.ID + 1;
+            blocks[thisStackElement.lastTrue.position]
+                .outA = CurrentID + 1;
+        } else {
+            blocks.push(
+                {
+                    type: "wrapper-open",
+                    wrapperType: "if-false"
+                },
+                {
+                    ID: ++CurrentID,
+                    type: "sum",
+                    content: "",
+                    outA: CurrentID + 1
+                },
+                {
+                    type: "wrapper-close"
+                },
+                {
+                    type: "wrapper-close"
+                }
+            );
+            blocks[thisStackElement.head]
+                .outA = CurrentID;
+            blocks[blocks.length - 6]
+                .outA = CurrentID + 1;
+        }
+    } else if (thisStackElement.type == "for") {
+        blocks.push(
+            {
+                ID: ++CurrentID,
+                type: "data",
+                content: thisStackElement.afterthought,
+                outA: CurrentID + 1
+            },
+            {
+                type: "wrapper-close"
+            },
+            {
+                type: "wrapper-open",
+                wrapperType: "for-sum"
+            },
+            {
+                ID: ++CurrentID,
+                type: "sum",
+                content: "",
+                outA: CurrentID + 1
+            },
+            {
+                ID: ++CurrentID,
+                type: "sum",
+                content: "",
+                outA: thisStackElement.condition.ID
+            },
+            {
+                type: "wrapper-close"
+            },
+            {
+                type: "wrapper-close"
+            }
+        );
+        blocks[thisStackElement.condition.position]
+            .outA = CurrentID + 1;
+    }
+    return blocks;
+}
+
+/** Tworzy bloczki, oprócz startu i stopu, na podstawie typu i treści linii. */
 function parseLines(lines){
-    let blocks = new Array(); // bloczki dostępne tylko w tej funkcji
-    let stack = new Array();
+    let blocks = new Array();
+    let stack = new Array(); // stos obiektów z informacjami o for'ach i if'ach
 
     let gotoLabelMap = new Map();
     let gotoCallMap = new Map();
 
-    lines.forEach((line)=>{
-
+    for (let line of lines) {
         let lineType = getLineType(line);
-
         switch(lineType) {
-        // bloczek danych
+        
         case "data":
-            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     type: lineType,
                     content: line,
                     outA: CurrentID + 1
@@ -98,13 +186,10 @@ function parseLines(lines){
             );
             break;
 
-
-        // bloczek wejścia wyjścia
         case "io":
-            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     type: lineType,
                     content: line,
                     outA: CurrentID + 1
@@ -113,14 +198,13 @@ function parseLines(lines){
             break;
 
         case "if":
-            CurrentID++;
             blocks.push(
                 {
                     type: "wrapper-open",
                     wrapperType: "if"
                 },
                 {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     type: lineType,
                     content: line
                         // usuwa `if` i `{` oraz znaki białe wokół nich
@@ -142,10 +226,9 @@ function parseLines(lines){
             break;
         
         case "else":
-            CurrentID++;
             stack[stack.length - 1]
                 .lastTrue = {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     position: blocks.length
                 };
             stack[stack.length - 1]
@@ -171,10 +254,9 @@ function parseLines(lines){
                 = /for\s+(.*);\s*(.*);\s*(.*)\{/.exec(line);
             [initialization, afterthought]
                 = preproc([initialization, afterthought]);
-            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     type: "data",
                     content: initialization,
                     outA: CurrentID + 1
@@ -186,12 +268,9 @@ function parseLines(lines){
                 {
                     type: "wrapper-open",
                     wrapperType: "for-body"
-                }
-            );
-            CurrentID++;
-            blocks.push(
+                },
                 {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     type: "if",
                     content: condition,
                     outB: CurrentID + 1,
@@ -221,105 +300,13 @@ function parseLines(lines){
         case "close-bracket":
             let thisStackElement = stack.pop();
             console.log(thisStackElement);
-            if (thisStackElement.type == "if"){
-                CurrentID++;
-                blocks.push(
-                    {
-                        ID: CurrentID,
-                        type: "sum",
-                        content: "",
-                        outA: CurrentID + 1
-                    },
-                    {
-                        type: "wrapper-close"
-                    }
-                );
-                if (thisStackElement.hasElse) {
-                    blocks.push(
-                        {
-                            type: "wrapper-close"
-                        }
-                    );
-                    blocks[thisStackElement.head]
-                        .outA = thisStackElement.lastTrue.ID + 1;
-                    blocks[thisStackElement.lastTrue.position]
-                        .outA = CurrentID + 1;
-                } else {
-                    CurrentID++;
-                    blocks.push(
-                        {
-                            type: "wrapper-open",
-                            wrapperType: "if-false"
-                        },
-                        {
-                            ID: CurrentID,
-                            type: "sum",
-                            content: "",
-                            outA: CurrentID + 1
-                        },
-                        {
-                            type: "wrapper-close"
-                        },
-                        {
-                            type: "wrapper-close"
-                        }
-                    );
-                    blocks[thisStackElement.head]
-                        .outA = CurrentID;
-                    blocks[blocks.length-6]
-                        .outA = CurrentID + 1;
-                }
-            } else if (thisStackElement.type == "for"){
-                CurrentID++
-                blocks.push(
-                    {
-                        ID: CurrentID,
-                        type: "data",
-                        content: thisStackElement.afterthought,
-                        outA: CurrentID + 1
-                    },
-                    {
-                        type: "wrapper-close"
-                    },
-                    {
-                        type: "wrapper-open",
-                        wrapperType: "for-sum"
-                    }
-                );
-                CurrentID++;
-                blocks.push(
-                    {
-                        ID: CurrentID,
-                        type: "sum",
-                        content: "",
-                        outA: CurrentID + 1
-                    }
-                )
-                CurrentID++;
-                blocks.push(
-                    {
-                        ID: CurrentID,
-                        type: "sum",
-                        content: "",
-                        outA: thisStackElement.condition.ID
-                    },
-                    {
-                        type: "wrapper-close"
-                    },
-                    {
-                        type: "wrapper-close"
-                    }
-                );
-                blocks[thisStackElement.condition.position]
-                    .outA = CurrentID + 1;
-            }
+            blocks = closeBracket(blocks, thisStackElement);
             break;
         
         case "goto-label":
-            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     type: "sum",
                     content: "",
                     outA: CurrentID + 1
@@ -330,10 +317,9 @@ function parseLines(lines){
             break;
 
         case "goto-call":
-            CurrentID++;
             blocks.push(
                 {
-                    ID: CurrentID,
+                    ID: ++CurrentID,
                     type: "sum",
                     content: "",
                 }
@@ -342,7 +328,6 @@ function parseLines(lines){
             gotoCallMap.set(blocks.length-1, target);
             break;
         }
-
         // łączy etykiety z instrukcjami goto 
         for (let elem of gotoCallMap){
             let call = elem[0];
@@ -350,7 +335,7 @@ function parseLines(lines){
             blocks[call].outA = gotoLabelMap.get(label);
         }
 
-    })
+    }
     console.log(blocks);
     return blocks;
 }
@@ -362,31 +347,16 @@ function parse(mag) {
     CurrentID = 0;
     blocks.push({
         "ID": CurrentID,
-		"width": 0,
-		"height": 0,
 		"type": "start",
 		"content": "START",
 		"outA": 1
-	})
-
+	});
     blocks.push.apply(blocks, parseLines(lines));
-    
-    CurrentID++;
     blocks.push({
-        "ID": CurrentID,
-        "width": 0,
-        "height": 0,
+        "ID": ++CurrentID,
         "type": "end",
         "content": "KONIEC"
-    })
-    
+    });
     Blocks = blocks; // "upublicznia" bloczki
-    let output = new Array();
-    blocks.forEach((block) => output.push(
-        JSON.stringify(block, null, 2)
-        .replace(/\n/g, "<br>")
-    ));
-    document.getElementById("json")
-        .innerHTML = output.join("<br><br>");
-    put(draw(Blocks));
+    draw(Blocks);
 }

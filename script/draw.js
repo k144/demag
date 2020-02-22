@@ -1,11 +1,16 @@
-function put(content) {
-    let board = $("#blocks");
+function put(content, target) {
+    let board = $(target);
     board.empty();
     board.append(content);
 }
 
 function draw(blocks) {
-    let buf = ''
+    put(drawBlocks(blocks), "#blocks");
+    put(drawJSON(blocks), "#json");
+}
+
+function drawBlocks(blocks){
+    let buf = '';
     blocks.forEach((block) =>{
         switch(block.type){
         case "wrapper-open":
@@ -13,11 +18,11 @@ function draw(blocks) {
                 '<div class="' +
                 'block-wrapper' + ' ' +
                 block.wrapperType + '-wrapper' +
-                '">'
+                '">';
             break;
         case "wrapper-close":
             buf +=
-                '</div>'
+                '</div>';
             break;
         default:
             buf +=
@@ -27,9 +32,18 @@ function draw(blocks) {
                 '" ' +
                 'id="' + block.ID + '">' +
                 block.content +
-                '</div>'
+                '</div>';
             break;
         }
     });
     return buf;
+}
+
+function drawJSON(blocks){
+    let output = new Array();
+    blocks.forEach((block) => output.push(
+        JSON.stringify(block, null, 2)
+        .replace(/\n/g, "<br>")
+    ));
+    return output.join("<br><br>");
 }

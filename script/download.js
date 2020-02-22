@@ -8,27 +8,42 @@ function updateFilename(){
     button.innerText = "pobierz " + algName + ".alg";
 }
 
-function download() {
-	let blocks = new Array();
-	for (let i = 0; i < Blocks.length; i++) {
-		let block = Blocks[i];
-		let blockID = block.ID;
-		// bloczki bez ID to wrappery
-		if (blockID == undefined) {
+function cleanup(blocks){
+	let result = new Array()
+	for (let block of blocks){
+		// bloczki bez wyjścia to nieistniejące w formacie alg wrappery
+		if (block.ID == undefined) {
 			continue;
 		}
-		let blockDiv = document.getElementById(blockID);
-		block.X = blockDiv.offsetLeft;
-		block.Y = blockDiv.offsetTop;
-		const noOut = 4294967295; // tak oznaczone jest puste wyjście bloczka
+		// tak oznaczone są puste wyjścia bloczka w plikach .alg
+		const noOut = 4294967295;
 		if (block.outA == undefined) {
 			block.outA = noOut;
 		}
 		if (block.outB == undefined) {
 			block.outB = noOut;
 		}
-		blocks.push(block);
+		result.push(block);
 	}
+	return result;
+}
+
+function getBlocksPos(blocks){
+	let result = new Array();
+	for (let block of blocks){
+		let blockDiv = document.getElementById(block.ID);
+		block.X = blockDiv.offsetLeft;
+		block.Y = blockDiv.offsetTop;
+		result.push(block);
+	}
+	return result;
+}
+
+function download() {
+	let blocks = Blocks;
+	blocks = cleanup(blocks);
+	console.log(blocks);
+	blocks = getBlocksPos(blocks);
 	console.log(blocks);
 	let JSONdata = new Blob([JSON.stringify(blocks)], { type: "text/plain;charset=utf-8" });
 	let fileReader = new FileReader();
@@ -36,15 +51,11 @@ function download() {
 	fileReader.onload = function () {
 		let arrayBuffer = fileReader.result;
 		let arr = new Uint8Array(arrayBuffer);
-		console.log("arr:", arr);
-		let decodedData = new Uint8Array(1000000);
-		console.log("puste:", decodedData);
+		const maxAlgByteSize = 1000000;
+		let decodedData = new Uint8Array(maxAlgByteSize);
 		bytesCopied = jalg(arr, decodedData);
 		decodedData = decodedData.slice(0, bytesCopied);
-		console.log("alg:", decodedData);
-		console.log("bytes copied: ", bytesCopied);
 		let decodedBlob = new Blob([decodedData]);
-		console.log(decodedBlob);
 		saveAs(decodedBlob, algName + ".alg");
-	};
+	}
 }
