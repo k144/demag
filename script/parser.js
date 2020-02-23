@@ -3,19 +3,19 @@ var Blocks = new Array(); // bloczki dostępne publicznie
 let CurrentID = 0;
 
 // tworzy bloczki startu i końca po załadowniu strony
-$(() => parse("")) 
+$(() => parse(""))
 
 var editorContent = "";
 
-function editorHandler(editor){
+function editorHandler(editor) {
     editorContent = editor.getValue("\n");
     parse(editorContent);
 }
 
 /** Usuwa zbędne znaki, oraz rozwija wybrane wyrażenia, np. `++` */
-function preproc(lines){
+function preproc(lines) {
     let result = new Array();
-    for (let line of lines){
+    for (let line of lines) {
         line = line.trim(); // usuwa znaki białe na początku i końcu
         let replaceMap = new Map([
             [/^(.*[^=:\+\-\*\/\^])=(?!=)/, "$1:="], // = -> :=
@@ -39,7 +39,7 @@ function preproc(lines){
             ]
 
         ]);
-        for (let entry of replaceMap){
+        for (let entry of replaceMap) {
             let regExp = entry[0];
             let out = entry[1];
             line = line.replace(regExp, out);
@@ -68,7 +68,6 @@ function getLineType(line) {
             return type;
         }
     }
-    
 }
 
 /**
@@ -76,7 +75,7 @@ function getLineType(line) {
  * Ten fragment jest dosyć długi, więc został przeniesiony
  * do osobnej funkcji. Zwraca przetworzone bloczki.
  * */
-function closeBracket(blocks, thisStackElement){
+function closeBracket(blocks, thisStackElement) {
     if (thisStackElement.type == "if") {
         blocks.push(
             {
@@ -164,7 +163,7 @@ function closeBracket(blocks, thisStackElement){
 }
 
 /** Tworzy bloczki, oprócz startu i stopu, na podstawie typu i treści linii. */
-function parseLines(lines){
+function parseLines(lines) {
     let blocks = new Array();
     let stack = new Array(); // stos obiektów z informacjami o for'ach i if'ach
 
@@ -173,163 +172,163 @@ function parseLines(lines){
 
     for (let line of lines) {
         let lineType = getLineType(line);
-        switch(lineType) {
-        
-        case "data":
-            blocks.push(
-                {
-                    ID: ++CurrentID,
-                    type: lineType,
-                    content: line,
-                    outA: CurrentID + 1
-                }
-            );
-            break;
+        switch (lineType) {
 
-        case "io":
-            blocks.push(
-                {
-                    ID: ++CurrentID,
-                    type: lineType,
-                    content: line,
-                    outA: CurrentID + 1
-                }    
-            );
-            break;
+            case "data":
+                blocks.push(
+                    {
+                        ID: ++CurrentID,
+                        type: lineType,
+                        content: line,
+                        outA: CurrentID + 1
+                    }
+                );
+                break;
 
-        case "if":
-            blocks.push(
-                {
-                    type: "wrapper-open",
-                    wrapperType: "if"
-                },
-                {
-                    ID: ++CurrentID,
-                    type: lineType,
-                    content: line
-                        // usuwa `if` i `{` oraz znaki białe wokół nich
-                        .replace(/(if)\s*/, "")
-                        .replace(/\s*\{\s*$/, ""),
-                    outB: CurrentID + 1
-                },
-                {
-                    type: "wrapper-open",
-                    wrapperType: "if-true"
-                }
-            );
-            stack.push(
-                {
-                    type: "if",
-                    head: blocks.length - 2, // pozycja tego bloczka warunkowego w tablicy bloczków
-                }
-            );
-            break;
-        
-        case "else":
-            stack[stack.length - 1]
-                .lastTrue = {
+            case "io":
+                blocks.push(
+                    {
+                        ID: ++CurrentID,
+                        type: lineType,
+                        content: line,
+                        outA: CurrentID + 1
+                    }
+                );
+                break;
+
+            case "if":
+                blocks.push(
+                    {
+                        type: "wrapper-open",
+                        wrapperType: "if"
+                    },
+                    {
+                        ID: ++CurrentID,
+                        type: lineType,
+                        content: line
+                            // usuwa `if` i `{` oraz znaki białe wokół nich
+                            .replace(/(if)\s*/, "")
+                            .replace(/\s*\{\s*$/, ""),
+                        outB: CurrentID + 1
+                    },
+                    {
+                        type: "wrapper-open",
+                        wrapperType: "if-true"
+                    }
+                );
+                stack.push(
+                    {
+                        type: "if",
+                        head: blocks.length - 2, // pozycja tego bloczka warunkowego w tablicy bloczków
+                    }
+                );
+                break;
+
+            case "else":
+                stack[stack.length - 1]
+                    .lastTrue = {
                     ID: ++CurrentID,
                     position: blocks.length
                 };
-            stack[stack.length - 1]
-                .hasElse = true;
-            blocks.push(
-                {
-                    ID: CurrentID,
-                    type: "sum",
-                    content: ""
-                },
-                {
-                    type: "wrapper-close"
-                },
-                {
-                    type: "wrapper-open",
-                    wrapperType: "if-false"
-                }
-            );
-            break;
-
-        case "for":
-            let [all, initialization, condition, afterthought]
-                = /for\s+(.*);\s*(.*);\s*(.*)\{/.exec(line);
-            [initialization, afterthought]
-                = preproc([initialization, afterthought]);
-            blocks.push(
-                {
-                    ID: ++CurrentID,
-                    type: "data",
-                    content: initialization,
-                    outA: CurrentID + 1
-                },
-                {
-                    type: "wrapper-open",
-                    wrapperType: "for"
-                },
-                {
-                    type: "wrapper-open",
-                    wrapperType: "for-body"
-                },
-                {
-                    ID: ++CurrentID,
-                    type: "if",
-                    content: condition,
-                    outB: CurrentID + 1,
-                }
-            )
-            stack.push(
-                {
-                    type: "for",
-                    condition: {
+                stack[stack.length - 1]
+                    .hasElse = true;
+                blocks.push(
+                    {
                         ID: CurrentID,
-                        position: blocks.length-1,
+                        type: "sum",
+                        content: ""
                     },
-                    afterthought: afterthought
-                }
-            );
-            break;
-    
-        case "for-range":
-            blocks.push(
-                {
-                    type: "if",
-                    content: "range"
-                }
-            );
-            break;
+                    {
+                        type: "wrapper-close"
+                    },
+                    {
+                        type: "wrapper-open",
+                        wrapperType: "if-false"
+                    }
+                );
+                break;
 
-        case "close-bracket":
-            let thisStackElement = stack.pop();
-            console.log(thisStackElement);
-            blocks = closeBracket(blocks, thisStackElement);
-            break;
-        
-        case "goto-label":
-            blocks.push(
-                {
-                    ID: ++CurrentID,
-                    type: "sum",
-                    content: "",
-                    outA: CurrentID + 1
-                }
-            );
-            line = line.replace(":", "");
-            gotoLabelMap.set(line, CurrentID)
-            break;
+            case "for":
+                let [all, initialization, condition, afterthought]
+                    = /for\s+(.*);\s*(.*);\s*(.*)\{/.exec(line);
+                [initialization, afterthought]
+                    = preproc([initialization, afterthought]);
+                blocks.push(
+                    {
+                        ID: ++CurrentID,
+                        type: "data",
+                        content: initialization,
+                        outA: CurrentID + 1
+                    },
+                    {
+                        type: "wrapper-open",
+                        wrapperType: "for"
+                    },
+                    {
+                        type: "wrapper-open",
+                        wrapperType: "for-body"
+                    },
+                    {
+                        ID: ++CurrentID,
+                        type: "if",
+                        content: condition,
+                        outB: CurrentID + 1,
+                    }
+                )
+                stack.push(
+                    {
+                        type: "for",
+                        condition: {
+                            ID: CurrentID,
+                            position: blocks.length - 1,
+                        },
+                        afterthought: afterthought
+                    }
+                );
+                break;
 
-        case "goto-call":
-            blocks.push(
-                {
-                    ID: ++CurrentID,
-                    type: "sum",
-                    content: "",
-                }
-            );
-            let target = line.replace(/goto\s*/, "");
-            gotoCallMap.set(blocks.length-1, target);
-            break;
+            case "for-range":
+                blocks.push(
+                    {
+                        type: "if",
+                        content: "range"
+                    }
+                );
+                break;
+
+            case "close-bracket":
+                let thisStackElement = stack.pop();
+                console.log(thisStackElement);
+                blocks = closeBracket(blocks, thisStackElement);
+                break;
+
+            case "goto-label":
+                blocks.push(
+                    {
+                        ID: ++CurrentID,
+                        type: "sum",
+                        content: "",
+                        outA: CurrentID + 1
+                    }
+                );
+                line = line.replace(":", "");
+                gotoLabelMap.set(line, CurrentID)
+                break;
+
+            case "goto-call":
+                blocks.push(
+                    {
+                        ID: ++CurrentID,
+                        type: "sum",
+                        content: "",
+                    }
+                );
+                let target = line.replace(/goto\s*/, "");
+                gotoCallMap.set(blocks.length - 1, target);
+                break;
         }
         // łączy etykiety z instrukcjami goto 
-        for (let elem of gotoCallMap){
+        for (let elem of gotoCallMap) {
             let call = elem[0];
             let label = elem[1];
             blocks[call].outA = gotoLabelMap.get(label);
@@ -347,10 +346,10 @@ function parse(mag) {
     CurrentID = 0;
     blocks.push({
         "ID": CurrentID,
-		"type": "start",
-		"content": "START",
-		"outA": 1
-	});
+        "type": "start",
+        "content": "START",
+        "outA": 1
+    });
     blocks.push.apply(blocks, parseLines(lines));
     blocks.push({
         "ID": ++CurrentID,

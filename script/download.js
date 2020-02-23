@@ -1,16 +1,16 @@
 let algName = '';
 
-function updateFilename(){
-    let field = document.getElementById("filename-field");
-    let button = document.getElementById("dl-button");
-    algName = field.value;
-    console.log(algName);
-    button.innerText = "pobierz " + algName + ".alg";
+function updateFilename() {
+	let field = document.getElementById("filename-field");
+	let button = document.getElementById("dl-button");
+	algName = field.value;
+	console.log(algName);
+	button.innerText = "pobierz " + algName + ".alg";
 }
 
-function cleanup(blocks){
+function cleanup(blocks) {
 	let result = new Array()
-	for (let block of blocks){
+	for (let block of blocks) {
 		// bloczki bez wyjścia to nieistniejące w formacie alg wrappery
 		if (block.ID == undefined) {
 			continue;
@@ -28,9 +28,9 @@ function cleanup(blocks){
 	return result;
 }
 
-function getBlocksPos(blocks){
+function getBlocksPos(blocks) {
 	let result = new Array();
-	for (let block of blocks){
+	for (let block of blocks) {
 		let blockDiv = document.getElementById(block.ID);
 		block.X = blockDiv.offsetLeft;
 		block.Y = blockDiv.offsetTop;
