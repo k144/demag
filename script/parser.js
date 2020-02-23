@@ -68,6 +68,8 @@ function getLineType(line) {
             return type;
         }
     }
+    console.log(line + "\ngetLineType: Niezdefiniowany typ linii.");
+    return undefined;
 }
 
 /**
@@ -318,7 +320,7 @@ function parseLines(lines) {
                 break;
 
             default:
-                console.log(lineType + ": nieznany typ linii");
+                console.log(lineType + "\nparseLines: Nieznany typ linii.");
 
         }
         // łączy etykiety z instrukcjami goto 
