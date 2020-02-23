@@ -175,16 +175,6 @@ function parseLines(lines) {
         switch (lineType) {
 
             case "data":
-                blocks.push(
-                    {
-                        ID: ++CurrentID,
-                        type: lineType,
-                        content: line,
-                        outA: CurrentID + 1
-                    }
-                );
-                break;
-
             case "io":
                 blocks.push(
                     {
@@ -326,6 +316,10 @@ function parseLines(lines) {
                 let target = line.replace(/goto\s*/, "");
                 gotoCallMap.set(blocks.length - 1, target);
                 break;
+
+            default:
+                console.log(lineType + ": nieznany typ linii");
+
         }
         // łączy etykiety z instrukcjami goto 
         for (let elem of gotoCallMap) {
