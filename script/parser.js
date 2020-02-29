@@ -54,7 +54,7 @@ function getLineType(line) {
     let typeMap = new Map([
         [/^\}$/,              "close-bracket"],
         [/^for\s+.*;.*;.*\{/, "for"],
-        [/^.*:=/,             "data"],
+        [/^(dim|.*:=)/,       "data"],
         [/^(read|write)+/,    "io"],
         [/^if\s+.*\{$/,       "if"],
         [/^\}\s*else\s*\{$/,  "else"],
