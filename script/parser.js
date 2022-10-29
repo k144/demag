@@ -18,7 +18,7 @@ function preproc(lines) {
     for (let line of lines) {
         line = line.trim(); // usuwa znaki białe na początku i końcu
         let replaceMap = new Map([
-            [/^(.*[^=:\+\-\*\/\^])=(?!=)/, "$1:="], // = -> :=
+            [/^(.*[^=^>^<^!:\+\-\*\/\^])=(?!=)/, "$1:="], // = -> :=
             // x += 1    ->     x := x + 1   itd.
             [
                 /^([a-zA-Z]\w*)(\s*)([\+\-\*\/\^])=(\s*)(.*)$/,
@@ -54,10 +54,10 @@ function getLineType(line) {
     let typeMap = new Map([
         [/^\}$/,              "close-bracket"],
         [/^for\s+.*;.*;.*\{/, "for"],
-        [/^(dim|.*:=)/,       "data"],
         [/^(read|write)+/,    "io"],
         [/^if\s+.*\{$/,       "if"],
         [/^\}\s*else\s*\{$/,  "else"],
+        [/^(dim|.*:=)/,       "data"],
         [/^\w*:$/,            "goto-label"],
         [/^goto\s+./,         "goto-call"]
     ]);
@@ -178,6 +178,11 @@ function parseLines(lines) {
 
             case "data":
             case "io":
+                // let last = blocks.length ? blocks[blocks.length-1] : undefined;
+                // if (last && last.type == lineType) {
+                //     last.content += "\r\n" + line;
+                //     break;
+                // }
                 blocks.push(
                     {
                         ID: ++CurrentID,
